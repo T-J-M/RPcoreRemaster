@@ -106,6 +106,7 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             break;
         case 'create_label':
             text_labels.push(API.createTextLabel(args[0], args[1], 10.0, 1.0));
+            break;
     }
 });
 
