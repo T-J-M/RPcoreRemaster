@@ -15,6 +15,8 @@ anim_menu.AddItem(API.createMenuItem("Social", "Name(s): guitar, drums"));
 anim_menu.AddItem(API.createMenuItem("Stop", "Stop playing animation"));
 anim_menu.AddItem(API.createMenuItem("Exit", "Close menu"));
 
+var text_labels = [];
+
 anim_menu.OnItemSelect.connect(function (sender, item, index) {
     if (item.Text === "Exit") {
         anim_menu.Visible = false;
@@ -102,6 +104,8 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             API.loadPageCefBrowser(mainBrowser, "bankpin.html");
             API.showCursor(true);
             break;
+        case 'create_label':
+            text_labels.push(API.createTextLabel(args[0], args[1], 10.0, 1.0));
     }
 });
 

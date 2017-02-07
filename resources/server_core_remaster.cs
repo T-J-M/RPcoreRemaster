@@ -47,6 +47,23 @@ public class server_core_remaster : Script
         new ColorData("Pink", new int[]  {135, 136, 137}),
     };
 
+    public struct StoreData
+    {
+        public string name;
+        public Vector3 location;
+
+        public StoreData(string n, Vector3 loc)
+        {
+            name = n;
+            location = loc;
+        }
+    }
+
+    StoreData[] store_locations = new StoreData[]
+    {
+        new StoreData("~o~Premium Deluxe Motorsport \n\\purchase", new Vector3(-61.70732, -1093.239, 26.4819)),
+    };
+
     Vector3[] loginscreen_locations = new Vector3[]
     {
         new Vector3(-438.796, 1075.821, 353.000),
@@ -147,9 +164,9 @@ public class server_core_remaster : Script
         public Ped player_ped_hash;
         public int armor;
         public int health;
-        public int money_in_hand;
-        public int money_in_bank;
-        public int pay_check;
+        public ulong money_in_hand;
+        public ulong money_in_bank;
+        public ulong pay_check;
         public int vehicles_owned;
         public int paid_fines;
         public int unpaid_fines;
@@ -163,7 +180,7 @@ public class server_core_remaster : Script
         {
             player_id = -1;
             player_real_name = "";
-            player_fake_name = "Test McTest";
+            player_fake_name = "Test_McTest";
             password = "";
             is_offline = true;
             is_logged = false;
@@ -310,7 +327,7 @@ public class server_core_remaster : Script
     public int getPlayerIndexByName(string name)
     {
         for (int i = 0; i < plr_database.Count; i++)
-            if (plr_database[i].player_fake_name == name || plr_database[i].player_real_name == name)
+            if (plr_database[i].player_fake_name.ToLower() == name.ToLower() || plr_database[i].player_real_name.ToLower() == name.ToLower())
                 return i;
         return -1;
     }
@@ -398,6 +415,8 @@ public class server_core_remaster : Script
 
     int plrs_online;
 
+    public List<Blip> map_blips = new List<Blip>();
+
     public server_core_remaster()
     {
         //Event handlers
@@ -410,6 +429,13 @@ public class server_core_remaster : Script
         API.onChatMessage += OnChatMessageHandler;
         API.onChatCommand += OnChatCommandHandler;
         API.onUpdate += OnUpdateHandler;
+
+        Blip newblip = API.createBlip(new Vector3(-61.70732, -1093.239, 26.4819));
+        API.setBlipSprite(newblip, 380);
+        API.setBlipColor(newblip, 47);
+        API.setBlipScale(newblip, 1.0f);
+
+        map_blips.Add(newblip);
     }
 
     public void OnPlayerDisconnectedHandler(Client player, string reason)
@@ -553,6 +579,12 @@ public class server_core_remaster : Script
         API.setEntityTransparency(player, 0);
         API.setEntityInvincible(player, true);
         API.setEntityCollisionless(player, true);
+
+        API.triggerClientEvent(player, "create_label", "~o~Premium Deluxe Motorsport \n\\purchase", new Vector3(-61.70732, -1093.239, 26.4819));
+        for(int i = 0; i < store_locations.Length; i++)
+        {
+            API.triggerClientEvent(player, "create_label", store_locations[i].name, store_locations[i].location);
+        }
     }
 
     public void OnUpdateHandler()
@@ -639,8 +671,6 @@ public class server_core_remaster : Script
         }
     }
 
-
-    //Command functions
     [Command("cef")]
     public void cefTestFunc(Client player)
     {
@@ -792,6 +822,48 @@ public class server_core_remaster : Script
         temp.deletable = true;
         plr_database[indx].inventory.Add(temp);
         API.sendChatMessageToPlayer(player, "Object added to inventory: " + temp.id);
+    }
+
+    [Command("teleport", GreedyArg = true)]
+    public void teleportFunc(Client player, string coords)
+    {
+        char[] delimiter = { ' ' };
+
+        string[] words = coords.Split(delimiter);
+
+        double x;
+        double y;
+        double z;
+
+        x = Convert.ToDouble(words[0]);
+        y = Convert.ToDouble(words[1]);
+        z = Convert.ToDouble(words[2]);
+
+        Vector3 telepos = new Vector3(x, y, z);
+        API.setEntityPosition(player, telepos);
+    }
+
+    [Command("addmoney", GreedyArg = true)]
+    public void addMoneyFunc(Client player, string name_amount)
+    {
+        char[] delimiter = { ' ' };
+        string[] words = name_amount.Split(delimiter);
+
+        int amount;
+        string name;
+
+        amount = Convert.ToInt32(words[0]);
+        name = words[1];
+        name = name.ToLower();
+
+        int indx = getPlayerIndexByName(name);
+        if(indx != -1)
+        {
+            PlayerData plr_temp = plr_database[indx];
+            plr_temp.money_in_bank += (ulong)amount;
+            plr_database[indx] = plr_temp;
+            API.sendChatMessageToPlayer(player, "Money added.");
+        }
     }
 
     [Command("take", "Usage: /take ~b~(object name) (car part)", GreedyArg = true)]
@@ -1506,7 +1578,7 @@ public class server_core_remaster : Script
         API.sendChatMessageToPlayer(player, "ID: ~b~" + plr_database[indx].player_id);
         API.sendChatMessageToPlayer(player, "Full Name: ~b~" + plr_database[indx].player_fake_name + "   |   ~w~Faction: ~b~" + plr_database[indx].faction);
         API.sendChatMessageToPlayer(player, "Phone #: ~b~" + plr_database[indx].phone_number);
-        API.sendChatMessageToPlayer(player, "Money (Bank): ~b~$" + plr_database[indx].money_in_bank + "  |  ~w~Money (Hand): ~b~$" + plr_database[indx].money_in_hand);
+        API.sendChatMessageToPlayer(player, "Money (Bank): ~b~$" + plr_database[indx].money_in_bank.ToString("N0") + "  |  ~w~Money (Hand): ~b~$" + plr_database[indx].money_in_hand.ToString("N0"));
         API.sendChatMessageToPlayer(player, "Paycheck: ~b~$" + plr_database[indx].pay_check);
         API.sendChatMessageToPlayer(player, "Vehicle(s) Owned: ~b~" + plr_database[indx].vehicles_owned);
         API.sendChatMessageToPlayer(player, "~b~|-------------------|");
