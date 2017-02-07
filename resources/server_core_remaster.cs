@@ -50,18 +50,20 @@ public class server_core_remaster : Script
     public struct StoreData
     {
         public string name;
+        public string store_type_id;
         public Vector3 location;
 
-        public StoreData(string n, Vector3 loc)
+        public StoreData(string n, string type, Vector3 loc)
         {
             name = n;
+            store_type_id = type;
             location = loc;
         }
     }
 
     StoreData[] store_locations = new StoreData[]
     {
-        new StoreData("~o~Premium Deluxe Motorsport \n\\purchase", new Vector3(-61.70732, -1093.239, 26.4819)),
+        new StoreData("~o~Premium Deluxe Motorsport \n\\purchase", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
     };
 
     Vector3[] loginscreen_locations = new Vector3[]
@@ -781,6 +783,33 @@ public class server_core_remaster : Script
             {
                 meCommand(player, " took off their seatbelt.");
             }
+        }
+    }
+
+    [Command("purchase")]
+    public void purchaseFunc(Client player)
+    {
+        Vector3 plr_pos = API.getEntityPosition(player);
+        float smallest_dist = 100.0f;
+        int store_index = -1;
+        for(int i = 0; i < store_locations.Length; i++)
+        {
+            float currdist = vecdist(plr_pos, store_locations[i].location);
+
+            if(currdist < smallest_dist)
+            {
+                smallest_dist = currdist;
+                store_index = i;
+            }
+        }
+
+        if(smallest_dist < 1.0f && store_index != -1)
+        {
+            API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "There is no store nearby!");
         }
     }
 
