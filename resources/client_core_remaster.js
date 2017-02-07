@@ -105,7 +105,14 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             API.showCursor(true);
             break;
         case 'create_label':
-            text_labels.push(API.createTextLabel(args[0], args[1], 10.0, 1.0));
+            var label = API.createTextLabel(args[0], args[1], 10.0, 1.5);
+            text_labels.push(label);
+            break;
+        case 'delete_all_labels':
+            var length = text_labels.length;
+            for (var i = 0; i < length; i++)
+                API.deleteEntity(text_labels[i]);
+            text_labels = [];
             break;
     }
 });

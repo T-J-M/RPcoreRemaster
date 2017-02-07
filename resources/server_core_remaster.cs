@@ -63,7 +63,7 @@ public class server_core_remaster : Script
 
     StoreData[] store_locations = new StoreData[]
     {
-        new StoreData("~o~Premium Deluxe Motorsport \n\\purchase", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
+        new StoreData("~o~Premium Deluxe Motorsport \npurchase", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
     };
 
     Vector3[] loginscreen_locations = new Vector3[]
@@ -582,11 +582,8 @@ public class server_core_remaster : Script
         API.setEntityInvincible(player, true);
         API.setEntityCollisionless(player, true);
 
-        API.triggerClientEvent(player, "create_label", "~o~Premium Deluxe Motorsport \n\\purchase", new Vector3(-61.70732, -1093.239, 26.4819));
-        for(int i = 0; i < store_locations.Length; i++)
-        {
-            API.triggerClientEvent(player, "create_label", store_locations[i].name, store_locations[i].location);
-        }
+        //API.triggerClientEvent(player, "create_label", "~o~Premium Deluxe Motorsport \n\\purchase", new Vector3(-61.70732, -1093.239, 26.4819));
+        
     }
 
     public void OnUpdateHandler()
@@ -1644,6 +1641,12 @@ public class server_core_remaster : Script
                     API.setEntityCollisionless(player, false);
                 }
                 plr_database[indx] = plr_temp;
+
+                for (int i = 0; i < store_locations.Length; i++)
+                {
+                    API.sendChatMessageToPlayer(player, "store_location_added");
+                    API.triggerClientEvent(player, "create_label", store_locations[i].name, store_locations[i].location);
+                }
             }
         }
         else
@@ -1689,5 +1692,8 @@ public class server_core_remaster : Script
         API.setEntityTransparency(player, 0);
         API.setEntityInvincible(player, true);
         API.setEntityCollisionless(player, true);
+        API.triggerClientEvent(player, "delete_all_labels");
+
+        
     }
 }
