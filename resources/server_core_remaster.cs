@@ -794,7 +794,7 @@ public class server_core_remaster : Script
         API.sendChatMessageToPlayer(player, "Object added to inventory: " + temp.id);
     }
 
-    [Command("take", GreedyArg = true)]
+    [Command("take", "Usage: /take ~b~(object name) (car part)", GreedyArg = true)]
     public void takeFunc(Client player, string action)
     {
         int indx = getPlayerIndexByName(player.name);
@@ -895,7 +895,7 @@ public class server_core_remaster : Script
         }
     }
 
-    [Command("put", GreedyArg = true)]
+    [Command("put", "Usage: /put ~b~(object name) (car part)", GreedyArg = true)]
     public void putFunc(Client player, string action)
     {
         int indx = getPlayerIndexByName(player.name);
@@ -987,7 +987,7 @@ public class server_core_remaster : Script
         }
     }
 
-    [Command("check", GreedyArg = true)]
+    [Command("check", "Usage: /check ~b~(car part)", GreedyArg = true)]
     public void checkFunc(Client player, string action)
     {
         action = action.ToLower();
@@ -1072,7 +1072,7 @@ public class server_core_remaster : Script
         }
     }
 
-    [Command("place", GreedyArg = true)]
+    [Command("place", "Usage: /place ~b~(object name)", GreedyArg = true)]
     public void spawnConeFunc(Client player, string item)
     {
         item = item.ToLower();
@@ -1240,7 +1240,7 @@ public class server_core_remaster : Script
         }
     }
 
-    [Command("open", GreedyArg = true)]
+    [Command("open", "Usage: /open ~b~(car part)", GreedyArg = true)]
     public void doorOpenFunc(Client player, string action)
     {
         int indx = getPlayerIndexByName(player.name);
@@ -1313,7 +1313,7 @@ public class server_core_remaster : Script
         }
     }
 
-    [Command("anim", GreedyArg = true)]
+    [Command("anim", "Usage: /anim ~b~(name)", GreedyArg = true)]
     public void animFunc(Client player, string action, bool loop = true)
     {
         int indx = getPlayerIndexByName(player.name);
@@ -1366,7 +1366,7 @@ public class server_core_remaster : Script
     }
 
     //Close car doors
-    [Command("close", GreedyArg = true)]
+    [Command("close", "Usage: /close ~b~(car part)", GreedyArg = true)]
     public void doorCloseFunc(Client player, string action)
     {
         int indx = getPlayerIndexByName(player.name);
@@ -1463,7 +1463,7 @@ public class server_core_remaster : Script
         }
     }
 
-    [Command("license", GreedyArg = true)]
+    [Command("license", "Usage: /license ~b~(plate #)", GreedyArg = true)]
     public void carinfoFunc(Client player, string license)
     {
         //API.triggerClientEvent(player, "vehicle_draw_text", temp.vehicle_hash, temp.vehicle_id, temp.owner_name, temp.license_plate);
