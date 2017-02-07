@@ -114,6 +114,9 @@ API.onServerEventTrigger.connect(function (eventName, args) {
                 API.deleteEntity(text_labels[i]);
             text_labels = [];
             break;
+        case 'sync_vehicle_data':
+            API.setVehicleDoorState(args[1], args[0], args[2]);
+            break;
     }
 });
 

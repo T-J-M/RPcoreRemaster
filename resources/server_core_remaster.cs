@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using GTANetworkServer;
 using GTANetworkShared;
-
+using System.Threading;
 
 public class server_core_remaster : Script
 {
@@ -586,9 +586,26 @@ public class server_core_remaster : Script
         
     }
 
+    public DateTime LastAnnounce;
     public void OnUpdateHandler()
     {
-
+        if(DateTime.Now.Subtract(LastAnnounce).TotalSeconds >= 10)
+        {
+            LastAnnounce = DateTime.Now;
+            List<NetHandle> vehs = new List<NetHandle>();
+            vehs = API.getAllVehicles();
+            for(int i = 0; i < vehs.Count; i++)
+            {
+                if (__debug)
+                    API.consoleOutput("OnUpdateHandler call");
+                API.setEntitySyncedData(vehs[i], "trunk", API.getVehicleDoorState(vehs[i], 5));
+                API.setEntitySyncedData(vehs[i], "hood", API.getVehicleDoorState(vehs[i], 4));
+                API.setEntitySyncedData(vehs[i], "door1", API.getVehicleDoorState(vehs[i], 0));
+                API.setEntitySyncedData(vehs[i], "door2", API.getVehicleDoorState(vehs[i], 1));
+                API.setEntitySyncedData(vehs[i], "door3", API.getVehicleDoorState(vehs[i], 2));
+                API.setEntitySyncedData(vehs[i], "door4", API.getVehicleDoorState(vehs[i], 3));
+            }
+        }
     }
 
     public void OnChatMessageHandler(Client player, string message, CancelEventArgs e)
@@ -1563,6 +1580,12 @@ public class server_core_remaster : Script
             API.setEntitySyncedData(temp.vehicle_hash, "indicator_right", false);
             API.setEntitySyncedData(temp.vehicle_hash, "indicator_left", false);
             API.setEntitySyncedData(temp.vehicle_hash, "locked", true);
+            API.setEntitySyncedData(temp.vehicle_hash, "trunk", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "hood", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "door1", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "door2", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "door3", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "door4", false);
             API.setVehicleNumberPlate(temp.vehicle_hash, (string)temp.license_plate);
             API.setVehicleEngineStatus(temp.vehicle_hash, false);
             API.setVehicleLocked(temp.vehicle_hash, true);
@@ -1668,16 +1691,18 @@ public class server_core_remaster : Script
                         API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 0, API.getEntitySyncedData(vehs[i], "indicator_right"));
                     if (API.getEntitySyncedData(vehs[i], "indicator_left") != null)
                         API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 1, API.getEntitySyncedData(vehs[i], "indicator_left"));
-
+                    
                     if (API.getEntitySyncedData(vehs[i], "trunk") != null)
                     {
                         if (API.getEntitySyncedData(vehs[i], "trunk") == true)
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 5, false, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 5, vehs[i], true);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 5, false, true);
                         }
                         else
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 5, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 5, vehs[i], false);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 5, true);
                         }
                     }
 
@@ -1685,11 +1710,13 @@ public class server_core_remaster : Script
                     {
                         if (API.getEntitySyncedData(vehs[i], "hood") == true)
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 4, false, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 4, vehs[i], true);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 4, false, true);
                         }
                         else
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 4, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 4, vehs[i], false);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 4, true);
                         }
                     }
 
@@ -1697,11 +1724,13 @@ public class server_core_remaster : Script
                     {
                         if (API.getEntitySyncedData(vehs[i], "door1") == true)
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 0, false, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 0, vehs[i], true);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 0, false, true);
                         }
                         else
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 0, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 0, vehs[i], false);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 0, true);
                         }
                     }
 
@@ -1709,11 +1738,13 @@ public class server_core_remaster : Script
                     {
                         if (API.getEntitySyncedData(vehs[i], "door2") == true)
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 1, false, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 1, vehs[i], true);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 1, false, true);
                         }
                         else
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 1, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 1, vehs[i], false);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 1, true);
                         }
                     }
 
@@ -1722,11 +1753,13 @@ public class server_core_remaster : Script
                     {
                         if (API.getEntitySyncedData(vehs[i], "door3") == true)
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 2, false, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 2, vehs[i], true);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 2, false, true);
                         }
                         else
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 2, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 2, vehs[i], false);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 2, true);
                         }
                     }
 
@@ -1735,11 +1768,13 @@ public class server_core_remaster : Script
                     {
                         if (API.getEntitySyncedData(vehs[i], "door4") == true)
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 3, false, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 3, vehs[i], true);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 3, false, true);
                         }
                         else
                         {
-                            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 3, true);
+                            API.triggerClientEvent(player, "sync_vehicle_data", 3, vehs[i], false);
+                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 3, true);
                         }
                     }
                 }
