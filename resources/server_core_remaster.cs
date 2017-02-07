@@ -1373,26 +1373,32 @@ public class server_core_remaster : Script
                     if (action == "trunk")
                     {
                         API.setVehicleDoorState(closestveh, 5, true);
+                        API.setEntitySyncedData(closestveh, "trunk", true);
                     }
                     else if (action == "hood")
                     {
                         API.setVehicleDoorState(closestveh, 4, true);
+                        API.setEntitySyncedData(closestveh, "hood", true);
                     }
                     else if (action == "door1")
                     {
                         API.setVehicleDoorState(closestveh, 0, true);
+                        API.setEntitySyncedData(closestveh, "door1", true);
                     }
                     else if (action == "door2")
                     {
                         API.setVehicleDoorState(closestveh, 1, true);
+                        API.setEntitySyncedData(closestveh, "door2", true);
                     }
                     else if (action == "door3")
                     {
                         API.setVehicleDoorState(closestveh, 2, true);
+                        API.setEntitySyncedData(closestveh, "door3", true);
                     }
                     else if (action == "door4")
                     {
                         API.setVehicleDoorState(closestveh, 3, true);
+                        API.setEntitySyncedData(closestveh, "door4", true);
                     }
                     else
                     {
@@ -1492,26 +1498,32 @@ public class server_core_remaster : Script
                 if (action == "trunk")
                 {
                     API.setVehicleDoorState(closestveh, 5, false);
+                    API.setEntitySyncedData(closestveh, "trunk", false);
                 }
                 else if (action == "hood")
                 {
                     API.setVehicleDoorState(closestveh, 4, false);
+                    API.setEntitySyncedData(closestveh, "hood", false);
                 }
                 else if (action == "door1")
                 {
                     API.setVehicleDoorState(closestveh, 0, false);
+                    API.setEntitySyncedData(closestveh, "door1", false);
                 }
                 else if (action == "door2")
                 {
                     API.setVehicleDoorState(closestveh, 1, false);
+                    API.setEntitySyncedData(closestveh, "door2", false);
                 }
                 else if (action == "door3")
                 {
                     API.setVehicleDoorState(closestveh, 2, false);
+                    API.setEntitySyncedData(closestveh, "door3", false);
                 }
                 else if (action == "door4")
                 {
                     API.setVehicleDoorState(closestveh, 3, false);
+                    API.setEntitySyncedData(closestveh, "door4", false);
                 }
                 else
                 {
@@ -1646,6 +1658,46 @@ public class server_core_remaster : Script
                 {
                     API.sendChatMessageToPlayer(player, "store_location_added");
                     API.triggerClientEvent(player, "create_label", store_locations[i].name, store_locations[i].location);
+                }
+
+                List<NetHandle> vehs = new List<NetHandle>();
+                vehs = API.getAllVehicles();
+                for (int i = 0; i < vehs.Count; i++)
+                {
+                    if (API.getEntitySyncedData(vehs[i], "indicator_right") != null)
+                        API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 0, API.getEntitySyncedData(vehs[i], "indicator_right"));
+                    if (API.getEntitySyncedData(vehs[i], "indicator_left") != null)
+                        API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 1, API.getEntitySyncedData(vehs[i], "indicator_left"));
+
+                    if (API.getEntitySyncedData(vehs[i], "trunk") != null)
+                        API.setVehicleDoorState(vehs[i], 5, API.getEntitySyncedData(vehs[i], "trunk"));
+                    else
+                        API.setVehicleDoorState(vehs[i], 5, false);
+
+                    if (API.getEntitySyncedData(vehs[i], "hood") != null)
+                        API.setVehicleDoorState(vehs[i], 4, API.getEntitySyncedData(vehs[i], "hood"));
+                    else
+                        API.setVehicleDoorState(vehs[i], 4, false);
+
+                    if (API.getEntitySyncedData(vehs[i], "door1") != null)
+                        API.setVehicleDoorState(vehs[i], 0, API.getEntitySyncedData(vehs[i], "door1"));
+                    else
+                        API.setVehicleDoorState(vehs[i], 0, false);
+
+                    if (API.getEntitySyncedData(vehs[i], "door2") != null)
+                        API.setVehicleDoorState(vehs[i], 1, API.getEntitySyncedData(vehs[i], "door2"));
+                    else
+                        API.setVehicleDoorState(vehs[i], 1, false);
+
+                    if (API.getEntitySyncedData(vehs[i], "door3") != null)
+                        API.setVehicleDoorState(vehs[i], 2, API.getEntitySyncedData(vehs[i], "door3"));
+                    else
+                        API.setVehicleDoorState(vehs[i], 2, false);
+
+                    if (API.getEntitySyncedData(vehs[i], "door4") != null)
+                        API.setVehicleDoorState(vehs[i], 3, API.getEntitySyncedData(vehs[i], "door4"));
+                    else
+                        API.setVehicleDoorState(vehs[i], 3, false);
                 }
             }
         }
