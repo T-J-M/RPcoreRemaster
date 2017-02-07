@@ -1562,6 +1562,8 @@ public class server_core_remaster : Script
         API.sendChatMessageToPlayer(player, "You have been registered! Use /login ~b~(password) ~w~to login.");
     }
 
+    //
+
     [Command("logout")]
     public void logoutFunc(Client player)
     {
