@@ -604,6 +604,12 @@ public class server_core_remaster : Script
                 API.setEntitySyncedData(vehs[i], "door2", API.getVehicleDoorState(vehs[i], 1));
                 API.setEntitySyncedData(vehs[i], "door3", API.getVehicleDoorState(vehs[i], 2));
                 API.setEntitySyncedData(vehs[i], "door4", API.getVehicleDoorState(vehs[i], 3));
+                API.setEntitySyncedData(vehs[i], "trunk_broken", API.isVehicleDoorBroken(vehs[i], 5));
+                API.setEntitySyncedData(vehs[i], "hood_broken", API.isVehicleDoorBroken(vehs[i], 4));
+                API.setEntitySyncedData(vehs[i], "door1_broken", API.isVehicleDoorBroken(vehs[i], 0));
+                API.setEntitySyncedData(vehs[i], "door2_broken", API.isVehicleDoorBroken(vehs[i], 1));
+                API.setEntitySyncedData(vehs[i], "door3_broken", API.isVehicleDoorBroken(vehs[i], 2));
+                API.setEntitySyncedData(vehs[i], "door4_broken", API.isVehicleDoorBroken(vehs[i], 3));
             }
         }
     }
@@ -1586,6 +1592,12 @@ public class server_core_remaster : Script
             API.setEntitySyncedData(temp.vehicle_hash, "door2", false);
             API.setEntitySyncedData(temp.vehicle_hash, "door3", false);
             API.setEntitySyncedData(temp.vehicle_hash, "door4", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "trunk_broken", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "hood_broken", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "door1_broken", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "door2_broken", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "door3_broken", false);
+            API.setEntitySyncedData(temp.vehicle_hash, "door4_broken", false);
             API.setVehicleNumberPlate(temp.vehicle_hash, (string)temp.license_plate);
             API.setVehicleEngineStatus(temp.vehicle_hash, false);
             API.setVehicleLocked(temp.vehicle_hash, true);
@@ -1693,90 +1705,30 @@ public class server_core_remaster : Script
                         API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 1, API.getEntitySyncedData(vehs[i], "indicator_left"));
                     
                     if (API.getEntitySyncedData(vehs[i], "trunk") != null)
-                    {
-                        if (API.getEntitySyncedData(vehs[i], "trunk") == true)
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 5, vehs[i], true);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 5, false, true);
-                        }
-                        else
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 5, vehs[i], false);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 5, true);
-                        }
-                    }
-
+                            API.triggerClientEvent(player, "sync_vehicle_doors", 5, vehs[i], API.getEntitySyncedData(vehs[i], "trunk"));
                     if (API.getEntitySyncedData(vehs[i], "hood") != null)
-                    {
-                        if (API.getEntitySyncedData(vehs[i], "hood") == true)
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 4, vehs[i], true);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 4, false, true);
-                        }
-                        else
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 4, vehs[i], false);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 4, true);
-                        }
-                    }
-
+                            API.triggerClientEvent(player, "sync_vehicle_doors", 4, vehs[i], API.getEntitySyncedData(vehs[i], "hood"));
                     if (API.getEntitySyncedData(vehs[i], "door1") != null)
-                    {
-                        if (API.getEntitySyncedData(vehs[i], "door1") == true)
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 0, vehs[i], true);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 0, false, true);
-                        }
-                        else
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 0, vehs[i], false);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 0, true);
-                        }
-                    }
-
+                            API.triggerClientEvent(player, "sync_vehicle_doors", 0, vehs[i], API.getEntitySyncedData(vehs[i], "door1"));
                     if (API.getEntitySyncedData(vehs[i], "door2") != null)
-                    {
-                        if (API.getEntitySyncedData(vehs[i], "door2") == true)
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 1, vehs[i], true);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 1, false, true);
-                        }
-                        else
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 1, vehs[i], false);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 1, true);
-                        }
-                    }
-
-
+                            API.triggerClientEvent(player, "sync_vehicle_doors", 1, vehs[i], API.getEntitySyncedData(vehs[i], "door2"));
                     if (API.getEntitySyncedData(vehs[i], "door3") != null)
-                    {
-                        if (API.getEntitySyncedData(vehs[i], "door3") == true)
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 2, vehs[i], true);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 2, false, true);
-                        }
-                        else
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 2, vehs[i], false);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 2, true);
-                        }
-                    }
-
-
+                            API.triggerClientEvent(player, "sync_vehicle_doors", 2, vehs[i], API.getEntitySyncedData(vehs[i], "door3"));
                     if (API.getEntitySyncedData(vehs[i], "door4") != null)
-                    {
-                        if (API.getEntitySyncedData(vehs[i], "door4") == true)
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 3, vehs[i], true);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_OPEN, vehs[i], 3, false, true);
-                        }
-                        else
-                        {
-                            API.triggerClientEvent(player, "sync_vehicle_data", 3, vehs[i], false);
-                            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_DOOR_SHUT, vehs[i], 3, true);
-                        }
-                    }
+                            API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
+                    if (API.getEntitySyncedData(vehs[i], "trunk_broken") != null)
+                        API.triggerClientEvent(player, "sync_vehicle_door_damage", 5, vehs[i], API.getEntitySyncedData(vehs[i], "trunk_broken"));
+                    if (API.getEntitySyncedData(vehs[i], "hood_broken") != null)
+                        API.triggerClientEvent(player, "sync_vehicle_door_damage", 4, vehs[i], API.getEntitySyncedData(vehs[i], "hood_broken"));
+                    if (API.getEntitySyncedData(vehs[i], "door1_broken") != null)
+                        API.triggerClientEvent(player, "sync_vehicle_door_damage", 0, vehs[i], API.getEntitySyncedData(vehs[i], "door1_broken"));
+                    if (API.getEntitySyncedData(vehs[i], "door2_broken") != null)
+                        API.triggerClientEvent(player, "sync_vehicle_door_damage", 1, vehs[i], API.getEntitySyncedData(vehs[i], "door2_broken"));
+                    if (API.getEntitySyncedData(vehs[i], "door3_broken") != null)
+                        API.triggerClientEvent(player, "sync_vehicle_door_damage", 2, vehs[i], API.getEntitySyncedData(vehs[i], "door3_broken"));
+                    if (API.getEntitySyncedData(vehs[i], "door4_broken") != null)
+                        API.triggerClientEvent(player, "sync_vehicle_door_damage", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4_broken"));
+
                 }
             }
         }

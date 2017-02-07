@@ -114,8 +114,12 @@ API.onServerEventTrigger.connect(function (eventName, args) {
                 API.deleteEntity(text_labels[i]);
             text_labels = [];
             break;
-        case 'sync_vehicle_data':
+        case 'sync_vehicle_door_state':
             API.setVehicleDoorState(args[1], args[0], args[2]);
+            break;
+        case 'sync_vehicle_door_damage':
+            if (args[2] === true)
+                API.callNative('0xD4D4F6A4AB575A33 ', args[1], args[0], true);
             break;
     }
 });
