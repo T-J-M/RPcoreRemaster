@@ -6,6 +6,7 @@ using System.Threading;
 
 public class server_core_remaster : Script
 {
+    
     public const bool __debug = true;
 
     [Flags]
@@ -51,11 +52,13 @@ public class server_core_remaster : Script
     {
         public string name;
         public string store_type_id;
+        public string item_category;
         public Vector3 location;
 
-        public StoreData(string n, string type, Vector3 loc)
+        public StoreData(string n, string item, string type, Vector3 loc)
         {
             name = n;
+            item_category = item;
             store_type_id = type;
             location = loc;
         }
@@ -63,7 +66,7 @@ public class server_core_remaster : Script
 
     StoreData[] store_locations = new StoreData[]
     {
-        new StoreData("~o~Premium Deluxe Motorsport \npurchase", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
+        new StoreData("~o~Premium Deluxe \nMotorsport", "Vehicle(s):", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
     };
 
     Vector3[] loginscreen_locations = new Vector3[]
@@ -166,9 +169,9 @@ public class server_core_remaster : Script
         public Ped player_ped_hash;
         public int armor;
         public int health;
-        public ulong money_in_hand;
-        public ulong money_in_bank;
-        public ulong pay_check;
+        public long money_in_hand;
+        public long money_in_bank;
+        public long pay_check;
         public int vehicles_owned;
         public int paid_fines;
         public int unpaid_fines;
@@ -589,7 +592,7 @@ public class server_core_remaster : Script
     public DateTime LastAnnounce;
     public void OnUpdateHandler()
     {
-        if(DateTime.Now.Subtract(LastAnnounce).TotalSeconds >= 10)
+        if(DateTime.Now.Subtract(LastAnnounce).TotalSeconds >= 2)
         {
             LastAnnounce = DateTime.Now;
             List<NetHandle> vehs = new List<NetHandle>();
@@ -691,6 +694,27 @@ public class server_core_remaster : Script
             API.sendChatMessageToPlayer(player, "do_anim_call: " + arguments[0]);
             animFunc(player, (string)arguments[0], true);
         }
+        else if(eventName == "purchase_car")
+        {
+            int indx = getPlayerIndexByName(player.name);
+            if(plr_database[indx].money_in_bank - Convert.ToInt64(arguments[1]) >= 0)
+            {
+                API.consoleOutput("moneybank: " + plr_database[indx].money_in_bank);
+                API.consoleOutput("converted1: " + Convert.ToUInt64(arguments[1]));
+                long prc = Convert.ToInt64(arguments[1]);
+                API.consoleOutput("prc: " + prc);
+                API.sendChatMessageToPlayer(player, "Purchased " + arguments[2] + " for $" + prc.ToString("N0") + "!");
+
+                PlayerData temp = plr_database[indx];
+                temp.money_in_bank -= prc;
+                plr_database[indx] = temp;
+                //spawncar
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "You cannot afford this!");
+            }
+        }
     }
 
     [Command("cef")]
@@ -710,7 +734,21 @@ public class server_core_remaster : Script
     public void getPos(Client player)
     {
         Vector3 vec = API.getEntityPosition(player);
-        API.sendChatMessageToPlayer(player, "X:" + vec.X + "Y:" + vec.Y + "Z:" + vec.Z);
+        API.sendChatMessageToPlayer(player, "X: " + vec.X + " Y: " + vec.Y + " Z: " + vec.Z);
+    }
+
+    [Command("carpos")]
+    public void getCarPos(Client player)
+    {
+        Vector3 vec = API.getEntityPosition(API.getPlayerVehicle(player));
+        API.sendChatMessageToPlayer(player, "X: " + vec.X + " Y: " + vec.Y + " Z: " + vec.Z);
+    }
+
+    [Command("carrot")]
+    public void getCarRot(Client player)
+    {
+        Vector3 vec = API.getEntityRotation(API.getPlayerVehicle(player));
+        API.sendChatMessageToPlayer(player, "X: " + vec.X + " Y: " + vec.Y + " Z: " + vec.Z);
     }
 
     [Command("setfaction", GreedyArg = true)]
@@ -726,6 +764,49 @@ public class server_core_remaster : Script
         else
         {
             API.sendChatMessageToPlayer(player, "Faction is not valid!");
+        }
+    }
+
+    [Command("attachcar")]
+    public void attachCarCommand(Client player)
+    {
+        NetHandle player_veh = API.getPlayerVehicle(player);
+
+        List<NetHandle> vehs = new List<NetHandle>();
+        vehs = API.getAllVehicles();
+        float smallestDist = 100.0f;
+        NetHandle closestveh = new NetHandle();
+        bool found = false;
+        for (int i = 0; i < vehs.Count; i++)
+        {
+            if(vehs[i] != player_veh)
+            {
+                float vr = vecdist(API.getEntityPosition(vehs[i]), API.getEntityPosition(player_veh)); //Get distance between car and player
+                if (vr < smallestDist)
+                {
+                    smallestDist = vr;
+                    closestveh = vehs[i];
+                    found = true;
+                }
+            }
+        }
+
+        if (found) //Found SOME car
+        {
+            if (smallestDist < 10.0f) //Close enough?
+            {
+                API.attachEntityToEntity(closestveh, player_veh, "bodyshell", new Vector3(0.0, -2.0, 1.0), new Vector3(0.0, 0.0, 0.0));
+                API.setEntityCollisionless(closestveh, false);
+                API.sendChatMessageToPlayer(player, "Vehicle attached!");
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "No car found nearby.");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "No car found nearby.");
         }
     }
 
@@ -806,7 +887,7 @@ public class server_core_remaster : Script
         }
     }
 
-    [Command("purchase")]
+    [Command("catalog")]
     public void purchaseFunc(Client player)
     {
         Vector3 plr_pos = API.getEntityPosition(player);
@@ -826,6 +907,7 @@ public class server_core_remaster : Script
         if(smallest_dist < 1.0f && store_index != -1)
         {
             API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
+            API.triggerClientEvent(player, "catalog_list", store_locations[store_index].name, store_locations[store_index].item_category, store_locations[store_index].store_type_id); 
         }
         else
         {
@@ -898,10 +980,10 @@ public class server_core_remaster : Script
         char[] delimiter = { ' ' };
         string[] words = name_amount.Split(delimiter);
 
-        int amount;
+        long amount;
         string name;
 
-        amount = Convert.ToInt32(words[0]);
+        amount = Convert.ToInt64(words[0]);
         name = words[1];
         name = name.ToLower();
 
@@ -909,9 +991,9 @@ public class server_core_remaster : Script
         if(indx != -1)
         {
             PlayerData plr_temp = plr_database[indx];
-            plr_temp.money_in_bank += (ulong)amount;
+            plr_temp.money_in_bank += amount;
             plr_database[indx] = plr_temp;
-            API.sendChatMessageToPlayer(player, "Money added.");
+            API.sendChatMessageToPlayer(player, "Money added: " + amount.ToString("N0"));
         }
     }
 
@@ -1578,7 +1660,7 @@ public class server_core_remaster : Script
             temp.vehicle_hash = hash;
             temp.position = API.getEntityPosition(hash);
             temp.rotation = API.getEntityRotation(hash);
-
+            
             temp.owner_name = plr_database[indx].player_fake_name;
             API.setEntitySyncedData(temp.vehicle_hash, "id", (int)temp.vehicle_id);
             API.setEntitySyncedData(temp.vehicle_hash, "owner", (string)temp.owner_name);
@@ -1605,6 +1687,8 @@ public class server_core_remaster : Script
             PlayerData plr = plr_database[indx];
             plr.vehicles_owned++;
             plr_database[indx] = plr;
+
+            API.setPlayerIntoVehicle(player, hash, -1);
         }
     }
 
@@ -1692,7 +1776,7 @@ public class server_core_remaster : Script
                 for (int i = 0; i < store_locations.Length; i++)
                 {
                     API.sendChatMessageToPlayer(player, "store_location_added");
-                    API.triggerClientEvent(player, "create_label", store_locations[i].name, store_locations[i].location);
+                    API.triggerClientEvent(player, "create_label", store_locations[i].name, store_locations[i].location, store_locations[i].store_type_id);
                 }
 
                 List<NetHandle> vehs = new List<NetHandle>();
@@ -1705,15 +1789,15 @@ public class server_core_remaster : Script
                         API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 1, API.getEntitySyncedData(vehs[i], "indicator_left"));
                     
                     if (API.getEntitySyncedData(vehs[i], "trunk") != null)
-                            API.triggerClientEvent(player, "sync_vehicle_doors", 5, vehs[i], API.getEntitySyncedData(vehs[i], "trunk"));
+                            API.triggerClientEvent(player, "sync_vehicle_door_state", 5, vehs[i], API.getEntitySyncedData(vehs[i], "trunk"));
                     if (API.getEntitySyncedData(vehs[i], "hood") != null)
-                            API.triggerClientEvent(player, "sync_vehicle_doors", 4, vehs[i], API.getEntitySyncedData(vehs[i], "hood"));
+                            API.triggerClientEvent(player, "sync_vehicle_door_state", 4, vehs[i], API.getEntitySyncedData(vehs[i], "hood"));
                     if (API.getEntitySyncedData(vehs[i], "door1") != null)
-                            API.triggerClientEvent(player, "sync_vehicle_doors", 0, vehs[i], API.getEntitySyncedData(vehs[i], "door1"));
+                            API.triggerClientEvent(player, "sync_vehicle_door_state", 0, vehs[i], API.getEntitySyncedData(vehs[i], "door1"));
                     if (API.getEntitySyncedData(vehs[i], "door2") != null)
-                            API.triggerClientEvent(player, "sync_vehicle_doors", 1, vehs[i], API.getEntitySyncedData(vehs[i], "door2"));
+                            API.triggerClientEvent(player, "sync_vehicle_door_state", 1, vehs[i], API.getEntitySyncedData(vehs[i], "door2"));
                     if (API.getEntitySyncedData(vehs[i], "door3") != null)
-                            API.triggerClientEvent(player, "sync_vehicle_doors", 2, vehs[i], API.getEntitySyncedData(vehs[i], "door3"));
+                            API.triggerClientEvent(player, "sync_vehicle_door_state", 2, vehs[i], API.getEntitySyncedData(vehs[i], "door3"));
                     if (API.getEntitySyncedData(vehs[i], "door4") != null)
                             API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
                     if (API.getEntitySyncedData(vehs[i], "trunk_broken") != null)
