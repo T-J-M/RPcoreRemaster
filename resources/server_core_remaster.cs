@@ -844,7 +844,7 @@ public class server_core_remaster : Script
 
         if (found) //Found SOME car
         {
-            if (smallestDist < 2.5f) //Close enough?
+            if (smallestDist < 3.0f) //Close enough?
             {
                 if (getVehicleOwnerNameByID(API.getEntitySyncedData(closestveh, "id")) == plr_database[indx].player_fake_name)
                 {
@@ -1380,7 +1380,7 @@ public class server_core_remaster : Script
 
         if (found)
         {
-            if (smallestDist < 2.5f)
+            if (smallestDist < 3.0f)
             {
                 if (getVehicleOwnerNameByID(API.getEntitySyncedData(closestveh, "id")) == plr_database[indx].player_fake_name)
                 {
