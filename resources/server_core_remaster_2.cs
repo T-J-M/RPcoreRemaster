@@ -530,7 +530,7 @@ public class server_core_remaster_2 : Script
         {
             if (API.getEntitySyncedData(API.getPlayerVehicle(player), "indicator_left") != null)
                 API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, API.getPlayerVehicle(player), 1, !API.getEntitySyncedData(API.getPlayerVehicle(player), "indicator_left"));
-            if (API.getEntitySyncedData(API.getPlayerVehicle(plwayer), "indicator_left") != null)
+            if (API.getEntitySyncedData(API.getPlayerVehicle(player), "indicator_left") != null)
                 API.setEntitySyncedData(API.getPlayerVehicle(player), "indicator_left", !API.getEntitySyncedData(API.getPlayerVehicle(player), "indicator_left"));
         }
         else if (eventName == "indicator_right")

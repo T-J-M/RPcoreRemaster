@@ -586,7 +586,6 @@ public class server_core_remaster : Script
         API.setEntityTransparency(player, 0);
         API.setEntityInvincible(player, true);
         API.setEntityCollisionless(player, true);
-
         //API.triggerClientEvent(player, "create_label", "~o~Premium Deluxe Motorsport \n\\purchase", new Vector3(-61.70732, -1093.239, 26.4819));
         
     }

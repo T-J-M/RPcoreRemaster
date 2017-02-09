@@ -222,14 +222,21 @@ API.onUpdate.connect(function () {
             API.callNative("SET_VEHICLE_OUT_OF_CONTROL", API.getPlayerVehicle(API.getLocalPlayer()), false, false);
         }
     }
+    
 });
 
 API.onKeyUp.connect(function (sender, e) {
-    if (e.KeyCode === Keys.J) {
-        API.triggerServerEvent("indicator_left");
-    }
-    else if (e.KeyCode === Keys.K) {
-        API.triggerServerEvent("indicator_right");
+    if(API.isPlayerInAnyVehicle(API.getLocalPlayer))
+    {
+        if(API.getPlayerVehicleSeat(API.getLocalPlayer()) == -1)
+        {
+            if (e.KeyCode === Keys.J) {
+                API.triggerServerEvent("indicator_left");
+            }
+            else if (e.KeyCode === Keys.K) {
+                API.triggerServerEvent("indicator_right");
+            }
+        }
     }
     else if (e.KeyCode === Keys.Escape) {
         if (mainBrowser !== null)
