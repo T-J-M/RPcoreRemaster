@@ -1,7 +1,7 @@
 ﻿<meta>
   <info name="RP Core" description="" author= "raptube69" version="1.0" shadowcopy="true" />
 
-  <script src="server_core_remaster.cs" type="server" lang="csharp" />
+  <script src="server_core_remaster_2.cs" type="server" lang="csharp" />
   <script src="client_core_remaster.js" type="client" lang="javascript" />
   
 </meta>

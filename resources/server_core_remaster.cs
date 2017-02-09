@@ -181,6 +181,8 @@ public class server_core_remaster : Script
         public List<FineData> fines;
         public List<ObjectData> inventory;
 
+        
+
         public PlayerData(bool value)
         {
             player_id = -1;
