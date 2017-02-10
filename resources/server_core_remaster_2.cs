@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GTANetworkServer;
 using GTANetworkShared;
+using System.Net;
 
 public class server_core_remaster_2 : Script
 {
@@ -340,6 +341,11 @@ public class server_core_remaster_2 : Script
             RandomIDObjectPool.Add(temp);
         }
         API.consoleOutput("server_core initialised.");
+
+        WebClient webClient = new WebClient();
+        string IP = webClient.DownloadString("http://api.ipify.org/");
+        API.consoleOutput("IP: " + IP);
+
     }
 
     public int getPlayerCount()
@@ -461,6 +467,7 @@ public class server_core_remaster_2 : Script
 
         List<NetHandle> vehs = new List<NetHandle>();
         vehs = API.getAllVehicles();
+
         for(int i = 0; i < vehs.Count; i++)
         {
             if (API.getEntitySyncedData(vehs[i], "indicator_right") != null)
@@ -479,7 +486,6 @@ public class server_core_remaster_2 : Script
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 2, vehs[i], API.getEntitySyncedData(vehs[i], "door3"));
             if (API.getEntitySyncedData(vehs[i], "door4") != null)
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
-
         }
     }
 
@@ -595,6 +601,19 @@ public class server_core_remaster_2 : Script
         {
             atleastMeAndCashGetTheActRight(player, (NetHandle)args[0], (NetHandle)args[1], Convert.ToDouble(args[2]), Convert.ToDouble(args[3]));
         }
+        else if(eventName == "explode")
+        {
+            //API.popVehicleTyre(API.getPlayerVehicle(player), 1, true);
+            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.STEER_UNLOCK_BIAS, API.getPlayerVehicle(player), true);
+            //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_STEER_BIAS, API.getPlayerVehicle(player), 0.0);
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 0, true, 1000.0);
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 1, true, 1000.0);
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 2, true, 1000.0);
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 3, true, 1000.0);
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 4, true, 1000.0);
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 5, true, 1000.0);
+
+        }
     }
 
     public void atleastMeAndCashGetTheActRight(Client player, NetHandle ent, NetHandle entT, double z1, double z2)
@@ -602,6 +621,10 @@ public class server_core_remaster_2 : Script
         double height = Math.Abs(z1 - z2);
         API.sendChatMessageToPlayer(player, "Height: " + height);
         API.attachEntityToEntity(ent, entT, "bodyshell", new Vector3(0.0, 0.0, height), new Vector3(0.0, 0.0, 0.0));
+
+        //SET_VEHICLE_TYRE_BURST(Vehicle vehicle, int index, BOOL onRim,
+  //float p3) //
+        
     }
 
     [Command("cef")]

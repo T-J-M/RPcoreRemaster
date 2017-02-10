@@ -202,7 +202,6 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             if (args[2] === true)
                 API.callNative('0xD4D4F6A4AB575A33', args[1], args[0], true);
             break;
-
         /*case 'trythis':
             var pos = API.returnNative('0x44A8FCB8ED227738', 5, args[0], 3);
             var pos2 = API.getEntityPosition(args[0]);
@@ -213,6 +212,9 @@ API.onServerEventTrigger.connect(function (eventName, args) {
            
     }
 });
+
+var call_midair = false;
+var max_height = 0.0;
 
 API.onUpdate.connect(function () {
     API.drawMenu(anim_menu);
@@ -228,9 +230,30 @@ API.onUpdate.connect(function () {
         }
         else if (is_veh_allwheels === false) {
             API.callNative("SET_VEHICLE_OUT_OF_CONTROL", API.getPlayerVehicle(API.getLocalPlayer()), false, false);
+            var newheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
+            if(newheight >= max_height)
+            {
+                max_height = newheight;
+            }
+            else
+            {
+                call_midair = true;
+            }
+        }
+        if(is_veh_allwheels === true && call_midair === true)
+        {
+
+            var currheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
+            var diff = Math.abs(max_height - currheight);
+            if(diff > 1.0)
+            {
+                API.triggerServerEvent("explode");
+            }
+            API.sendChatMessage("Difference: " + diff);
+            max_height = 0.0;
+            call_midair = false;
         }
     }
-    
 });
 
 API.onKeyUp.connect(function (sender, e) {
