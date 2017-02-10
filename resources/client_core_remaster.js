@@ -202,6 +202,14 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             if (args[2] === true)
                 API.callNative('0xD4D4F6A4AB575A33', args[1], args[0], true);
             break;
+
+        /*case 'trythis':
+            var pos = API.returnNative('0x44A8FCB8ED227738', 5, args[0], 3);
+            var pos2 = API.getEntityPosition(args[0]);
+            API.sendChatMessage("X2: " + pos2.X + " Y2: " + pos2.Y + " Z2: " + pos2.Z);
+            API.sendChatMessage("X: " + pos.X + " Y: " + pos.Y + " Z: " + pos.Z);
+            API.triggerServerEvent("actright", args[0], args[1], pos.Z, pos2.Z);
+            break;*/
            
     }
 });
@@ -226,7 +234,7 @@ API.onUpdate.connect(function () {
 });
 
 API.onKeyUp.connect(function (sender, e) {
-    if(API.isPlayerInAnyVehicle(API.getLocalPlayer))
+    if(API.isPlayerInAnyVehicle(API.getLocalPlayer()))
     {
         if(API.getPlayerVehicleSeat(API.getLocalPlayer()) == -1)
         {

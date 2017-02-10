@@ -563,6 +563,17 @@ public class server_core_remaster_2 : Script
                 API.sendChatMessageToPlayer(player, "You cannot afford this!");
             }
         }
+        else if(eventName == "actright")
+        {
+            atleastMeAndCashGetTheActRight(player, (NetHandle)args[0], (NetHandle)args[1], Convert.ToDouble(args[2]), Convert.ToDouble(args[3]));
+        }
+    }
+
+    public void atleastMeAndCashGetTheActRight(Client player, NetHandle ent, NetHandle entT, double z1, double z2)
+    {
+        double height = Math.Abs(z1 - z2);
+        API.sendChatMessageToPlayer(player, "Height: " + height);
+        API.attachEntityToEntity(ent, entT, "bodyshell", new Vector3(0.0, 0.0, height), new Vector3(0.0, 0.0, 0.0));
     }
 
     [Command("cef")]
@@ -879,6 +890,154 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    [Command("close", "Usage: /close ~b~(car part)", GreedyArg = true)]
+    public void doorCloseFunc(Client player, string action)
+    {
+        List<NetHandle> vehs = new List<NetHandle>();
+        vehs = API.getAllVehicles();
+        float smallestDist = 100.0f;
+        NetHandle closestveh = new NetHandle();
+        bool found = false;
+        for (int i = 0; i < vehs.Count; i++)
+        {
+            float vr = vecdist(API.getEntityPosition(vehs[i]), API.getEntityPosition(player));
+            if (vr < smallestDist)
+            {
+                smallestDist = vr;
+                closestveh = vehs[i];
+                found = true;
+            }
+        }
+
+        if (found)
+        {
+            if (smallestDist < 3.5f)
+            {
+                //Can be done regardless if car is locked or not
+                if (action == "trunk")
+                {
+                    API.setVehicleDoorState(closestveh, 5, false);
+                    API.setEntitySyncedData(closestveh, "trunk", false);
+                }
+                else if (action == "hood")
+                {
+                    API.setVehicleDoorState(closestveh, 4, false);
+                    API.setEntitySyncedData(closestveh, "hood", false);
+                }
+                else if (action == "door1")
+                {
+                    API.setVehicleDoorState(closestveh, 0, false);
+                    API.setEntitySyncedData(closestveh, "door1", false);
+                }
+                else if (action == "door2")
+                {
+                    API.setVehicleDoorState(closestveh, 1, false);
+                    API.setEntitySyncedData(closestveh, "door2", false);
+                }
+                else if (action == "door3")
+                {
+                    API.setVehicleDoorState(closestveh, 2, false);
+                    API.setEntitySyncedData(closestveh, "door3", false);
+                }
+                else if (action == "door4")
+                {
+                    API.setVehicleDoorState(closestveh, 3, false);
+                    API.setEntitySyncedData(closestveh, "door4", false);
+                }
+                else
+                {
+                    API.sendChatMessageToPlayer(player, "Part does not exist!");
+                }
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "No car found nearby.");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "No car found nearby.");
+        }
+    }
+
+    [Command("open", "Usage: /open ~b~(car part)", GreedyArg = true)]
+    public void doorOpenFunc(Client player, string action)
+    {
+        List<NetHandle> vehs = new List<NetHandle>();
+        vehs = API.getAllVehicles();
+        float smallestDist = 100.0f;
+        NetHandle closestveh = new NetHandle();
+        bool found = false;
+        for (int i = 0; i < vehs.Count; i++)
+        {
+            float vr = vecdist(API.getEntityPosition(vehs[i]), API.getEntityPosition(player));
+            if (vr < smallestDist)
+            {
+                smallestDist = vr;
+                closestveh = vehs[i];
+                found = true;
+            }
+        }
+
+        if (found)
+        {
+            if (smallestDist < 3.5f)
+            {
+                //if (getOwnerNameByVehicleID(API.getEntitySyncedData(closestveh, "id")) == PlayerDatabase[indx].player_fake_name)
+                //{
+                if (API.getEntitySyncedData(closestveh, "locked") == true)
+                {
+                    API.sendChatMessageToPlayer(player, "This vehicle is locked!");
+                }
+                else
+                {
+                    if (action == "trunk")
+                    {
+                        API.setVehicleDoorState(closestveh, 5, true);
+                        API.setEntitySyncedData(closestveh, "trunk", true);
+                    }
+                    else if (action == "hood")
+                    {
+                        API.setVehicleDoorState(closestveh, 4, true);
+                        API.setEntitySyncedData(closestveh, "hood", true);
+                    }
+                    else if (action == "door1")
+                    {
+                        API.setVehicleDoorState(closestveh, 0, true);
+                        API.setEntitySyncedData(closestveh, "door1", true);
+                    }
+                    else if (action == "door2")
+                    {
+                        API.setVehicleDoorState(closestveh, 1, true);
+                        API.setEntitySyncedData(closestveh, "door2", true);
+                    }
+                    else if (action == "door3")
+                    {
+                        API.setVehicleDoorState(closestveh, 2, true);
+                        API.setEntitySyncedData(closestveh, "door3", true);
+                    }
+                    else if (action == "door4")
+                    {
+                        API.setVehicleDoorState(closestveh, 3, true);
+                        API.setEntitySyncedData(closestveh, "door4", true);
+                    }
+                    else
+                    {
+                        API.sendChatMessageToPlayer(player, "Part does not exist!");
+                    }
+                }
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "No car found nearby.");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "No car found nearby.");
+        }
+    }
+
     [Command("unlock")]
     public void unlockFunc(Client player)
     {
@@ -1065,5 +1224,81 @@ public class server_core_remaster_2 : Script
         {
             API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
         }
+    }
+
+
+    
+
+    [Command("attachcar")]
+    public void attachCarCommand(Client player)
+    {
+        NetHandle player_veh = API.getPlayerVehicle(player);
+
+        List<NetHandle> vehs = new List<NetHandle>();
+        vehs = API.getAllVehicles();
+        float smallestDist = 100.0f;
+        NetHandle closestveh = new NetHandle();
+        bool found = false;
+        for (int i = 0; i < vehs.Count; i++)
+        {
+            if (vehs[i] != player_veh)
+            {
+                float vr = vecdist(API.getEntityPosition(vehs[i]), API.getEntityPosition(player_veh)); //Get distance between car and player
+                if (vr < smallestDist)
+                {
+                    smallestDist = vr;
+                    closestveh = vehs[i];
+                    found = true;
+                }
+            }
+        }
+
+        if (found) //Found SOME car
+        {
+            if (smallestDist < 10.0f) //Close enough?
+            {
+                /*NetHandle obj = API.createObject(-1036807324, API.getEntityPosition(player), API.getEntityRotation(player));
+                API.attachEntityToEntity(obj, closestveh, "wheel_lf", new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0));
+                Vector3 pos = API.getEntityPosition(obj);
+                API.sendChatMessageToPlayer(player, "X: " + pos.X + " Y: " + pos.Y + " Z: " + pos.Z);
+
+                NetHandle obj2 = API.createObject(-1036807324, API.getEntityPosition(player), API.getEntityRotation(player));
+                API.attachEntityToEntity(obj2, closestveh, "roof", new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0));
+                Vector3 pos2 = API.getEntityPosition(obj2);
+                API.sendChatMessageToPlayer(player, "X: " + pos2.X + " Y: " + pos2.Y + " Z: " + pos2.Z);*/
+
+                float whatever = API.fetchNativeFromPlayer<float>(player, GTANetworkServer.Hash.GET_ENTITY_HEIGHT_ABOVE_GROUND, closestveh);
+                API.sendChatMessageToPlayer(player, "height: " + whatever);
+                API.attachEntityToEntity(closestveh, player_veh, "bodyshell", new Vector3(0.0, -2.0, Convert.ToDouble(whatever) + 0.425), new Vector3(0.0, 0.0, 0.0));
+                API.sendChatMessageToPlayer(player, "Vehicle attached!");
+                API.setEntitySyncedData(closestveh, "attached", true);
+                API.setEntitySyncedData(player_veh, "atachee", closestveh);
+
+                //API.triggerClientEvent(player, "trythis", closestveh, player_veh);
+                /*double height = Math.Abs(bone1position - bone2position);
+                API.sendChatMessageToPlayer(player, "b1z: " + bone1position);
+                API.sendChatMessageToPlayer(player, "b2z:" + bone2position);
+                API.sendChatMessageToPlayer(player, "height: " + height);
+                API.attachEntityToEntity(vehicle_database[closestveh].vehicle_object, vehicle_database[player_veh].vehicle_object, "bodyshell", new Vector3(0.0, -2.0, height), new Vector3(0.0, 0.0, 0.0));
+                API.setEntitySyncedData(vehicle_database[player_veh].vehicle_object, "attached", closestveh);
+                API.setEntityCollisionless(vehicle_database[closestveh].vehicle_object, false);*/
+
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "No car found nearby.");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "No car found nearby.");
+        }
+    }
+
+    [Command("detach")]
+    public void detachCarCommand(Client player)
+    {
+        API.detachEntity(API.getEntitySyncedData(API.getPlayerVehicle(player), "attachee"));
+        API.setEntitySyncedData(API.getEntitySyncedData(API.getPlayerVehicle(player), "attachee"), "attached", false);
     }
 }
