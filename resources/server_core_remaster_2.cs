@@ -42,6 +42,17 @@ public class server_core_remaster_2 : Script
         new Vector3(1070.206, -711.958, 70.483),
     };
 
+    public struct DoubleVector3
+    {
+        public Vector3 pos;
+        public Vector3 rot;
+        public DoubleVector3(Vector3 p, Vector3 r)
+        {
+            pos = p;
+            rot = r;
+        }
+    }
+
     public struct StoreData
     {
         public string name;
@@ -63,6 +74,18 @@ public class server_core_remaster_2 : Script
         new StoreData("~o~Premium Deluxe \nMotorsport", "Vehicle(s):", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
     };
 
+    DoubleVector3[] dealership_1_spawn_locations = new DoubleVector3[]
+    {
+        new DoubleVector3(new Vector3(-42.30667, -1116.657, 26.02187), new Vector3(0.05719259, -0.00925794, -0.3153604)),
+        new DoubleVector3(new Vector3(-47.85758, -1116.692, 26.02124), new Vector3(0.002204725, -0.0001127388, 2.004499)),
+        new DoubleVector3(new Vector3(-50.67634, -1116.675, 26.02167), new Vector3(-0.007012921, 0, 2.671517)),
+        new DoubleVector3(new Vector3(-53.56318, -1116.988, 26.02145), new Vector3(-0.009828809, 0.00459637, 0.3640674)),
+        new DoubleVector3(new Vector3(-56.30627, -1117.286, 26.02164), new Vector3(-0.02442851, 0.001244397, 0.08249664)),
+        new DoubleVector3(new Vector3(-43.70016, -1109.625, 26.02453), new Vector3(-0.1142287, -0.05879881, 71.22818)),
+        new DoubleVector3(new Vector3(-52.19479, -1106.735, 26.02584), new Vector3(-0.1178563, -0.06428397, 71.15902)),
+    };
+
+    public static Random rnd = new Random();
 
     public struct ColorData
     {
@@ -268,7 +291,7 @@ public class server_core_remaster_2 : Script
     public int getPlayerDatabaseIndexByDisplayName(string name)
     {
         for (int i = 0; i < player_database.Count; i++)
-            if (player_database[i].player_display_name == name)
+            if (player_database[i].player_display_name.ToLower() == name)
                 return i;
         return -1;
     }
@@ -322,7 +345,6 @@ public class server_core_remaster_2 : Script
     public void OnResourceStartHandler()
     {
         API.consoleOutput("server_core initialising...");
-        Random rnd = new Random();
         for (int i = 0; i < 1000; i++)
         {
             int temp = rnd.Next(1, 100000);
@@ -346,8 +368,10 @@ public class server_core_remaster_2 : Script
         string IP = webClient.DownloadString("http://api.ipify.org/");
         API.consoleOutput("IP: " + IP);
 
-    }
+        API.requestIpl("shr_int");
+        API.removeIpl("fakeint");
 
+    }
     public int getPlayerCount()
     {
         int online = 0;
@@ -451,11 +475,10 @@ public class server_core_remaster_2 : Script
             API.consoleOutput("Player (" + player.name + ") does not exist in database.");
             PlayerData player_data = new PlayerData(player, getRandomIDPlayerPool(), API.pedNameToModel("Mani"), player.name, "test_mcbutt", "null_password");
             player_database.Add(player_data);
-            API.sendChatMessageToPlayer(player, "Please ~b~register ~w~using /regsiter [firstname_lastname] [password]");
+            API.sendChatMessageToPlayer(player, "Please ~b~register ~w~using /register [firstname_lastname] [password]");
         }
 
-        Random rnd_loc = new Random();
-        int rnd_location = rnd_loc.Next(0, loginscreen_locations.Length);
+        int rnd_location = rnd.Next(0, loginscreen_locations.Length);
         API.setPlayerSkin(player, API.pedNameToModel("Mani"));
         API.setEntityPosition(player, loginscreen_locations[rnd_location]);
         API.setEntityPositionFrozen(player, true);
@@ -557,6 +580,17 @@ public class server_core_remaster_2 : Script
             }
         }
     }
+    private static readonly object syncLock = new object();
+    public static bool randomBool()
+    {
+        lock (syncLock)
+        { // synchronize
+            int prob = rnd.Next(100);
+            return prob <= 80;
+        }
+    }
+
+    public int dealership_1_spawn_counter = 0;
 
     public void OnClientEventTriggerHandler(Client player, string eventName, params object[] args)
     {
@@ -590,6 +624,16 @@ public class server_core_remaster_2 : Script
                 PlayerData temp = player_database[index];
                 temp.player_money_bank -= prc;
                 player_database[index] = temp;
+
+                if((string)args[3] == "dealership_1")
+                {
+                    spawnCar(player, (string)args[0], true, dealership_1_spawn_locations[dealership_1_spawn_counter].pos, dealership_1_spawn_locations[dealership_1_spawn_counter].rot);
+                    dealership_1_spawn_counter++;
+                    if (dealership_1_spawn_counter >= dealership_1_spawn_locations.Length)
+                    {
+                        dealership_1_spawn_counter = 0;
+                    }
+                }
                 //spawn car for player
             }
             else
@@ -606,13 +650,18 @@ public class server_core_remaster_2 : Script
             //API.popVehicleTyre(API.getPlayerVehicle(player), 1, true);
             //API.sendNativeToPlayer(player, GTANetworkServer.Hash.STEER_UNLOCK_BIAS, API.getPlayerVehicle(player), true);
             //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_STEER_BIAS, API.getPlayerVehicle(player), 0.0);
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 0, true, 1000.0);
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 1, true, 1000.0);
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 2, true, 1000.0);
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 3, true, 1000.0);
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 4, true, 1000.0);
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 5, true, 1000.0);
-
+            if(randomBool())
+                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 0, true, 1000.0);
+            if (randomBool())
+                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 1, true, 1000.0);
+            if (randomBool())
+                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 2, true, 1000.0);
+            if (randomBool())
+                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 3, true, 1000.0);
+            if (randomBool())
+                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 4, true, 1000.0);
+            if (randomBool())
+                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 5, true, 1000.0);
         }
     }
 
@@ -845,11 +894,20 @@ public class server_core_remaster_2 : Script
     }
 
     [Command("spawncar", GreedyArg = true)]
-    public void spawnCar(Client player, string carname)
+    public void spawnCarFunc(Client player, string carname)
+    {
+        spawnCar(player, carname, false, new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0));
+    }
+
+    public void spawnCar(Client player, string carname, bool forcePos, Vector3 pos, Vector3 rot)
     {
         int indx = getPlayerDatabaseIndexByClient(player);
         API.sendChatMessageToPlayer(player, "Spawned car!");
-        Vehicle hash = API.createVehicle(API.vehicleNameToModel(carname), API.getEntityPosition(player), API.getEntityRotation(player), 0, 0);
+        Vehicle hash;
+        if(forcePos)
+            hash = API.createVehicle(API.vehicleNameToModel(carname), pos, rot, 0, 0);
+        else
+            hash = API.createVehicle(API.vehicleNameToModel(carname), API.getEntityPosition(player), API.getEntityRotation(player), 0, 0);
         //API.setVehicleNumberPlate(hash, "TJM");
         VehicleData temp = new VehicleData(hash, getRandomIDVehiclePool(), API.getEntityPosition(hash), API.getEntityRotation(hash), "tjm000", player_database[indx].player_display_name, "civillian");
 
@@ -1685,18 +1743,26 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("addmoney", GreedyArg = true)]
+    [Command("addmoney", "Usage: /addmoney [amount] [firstname_lastname]", GreedyArg = true)]
     public void addMoneyFunc(Client player, string name_amount)
     {
         char[] delimiter = { ' ' };
         string[] words = name_amount.Split(delimiter);
 
         long amount;
-        string name;
+        string name = "";
 
         amount = Convert.ToInt64(words[0]);
-        name = words[1];
-        name = name.ToLower();
+        if(words.Length == 2)
+        {
+            name = words[1];
+            name = name.ToLower();
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "Incorrect format.");
+            return;
+        }
 
         int indx = getPlayerDatabaseIndexByDisplayName(name);
         if (indx != -1)
@@ -1852,6 +1918,41 @@ public class server_core_remaster_2 : Script
         else
         {
             API.sendChatMessageToPlayer(player, "You cannot do that!");
+        }
+    }
+
+    [Command("catalog")]
+    public void purchaseFunc(Client player)
+    {
+        if(!API.isPlayerInAnyVehicle(player))
+        {
+            Vector3 plr_pos = API.getEntityPosition(player);
+            float smallest_dist = 100.0f;
+            int store_index = -1;
+            for (int i = 0; i < store_locations.Length; i++)
+            {
+                float currdist = vecdist(plr_pos, store_locations[i].location);
+
+                if (currdist < smallest_dist)
+                {
+                    smallest_dist = currdist;
+                    store_index = i;
+                }
+            }
+
+            if (smallest_dist < 2.0f && store_index != -1)
+            {
+                API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
+                API.triggerClientEvent(player, "catalog_list", store_locations[store_index].name, store_locations[store_index].item_category, store_locations[store_index].store_type_id);
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "There is no store nearby!");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
         }
     }
 }

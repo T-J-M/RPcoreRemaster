@@ -34,8 +34,30 @@ function formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
 }
 
+var dealership_1_display_car = null;
+var oldcam = API.getActiveCamera();
+var inside_car_showroom = false;
+
 function confirmButton(name, price, veh_name)
 {
+    inside_car_showroom = true;
+    var vec3 = new Vector3(-43.59027, -1098.547, 26.00982);
+    var rot3 = new Vector3(-0.06739808, -0.004466934, 91.13767);
+    //var cam3 = new Vector3(0.0, 0.0, 0.0);
+    dealership_1_display_car = API.createVehicle(API.vehicleNameToModel(veh_name), vec3, 0.0);
+    API.setEntityRotation(dealership_1_display_car, rot3);
+    API.setEntityPositionFrozen(dealership_1_display_car, true);
+    API.setPlayerIntoVehicle(dealership_1_display_car, -1);
+    API.setGameplayCameraActive();
+    //API.setCameraRotation(API.getActiveCamera(), cam3);
+    /*oldcam = API.getActiveCamera();
+    var newcam = API.createCamera(API.getEntityPosition(API.getLocalPlayer()), API.getEntityRotation(API.getLocalPlayer()));
+    API.setActiveCamera(newcam);
+
+    var offset = new Vector3(3.0, -5.0, 2.0);
+    API.attachCameraToEntity(newcam, dealership_1_display_car, offset);
+    var offset2 = new Vector3(0.0, 0.0, 0.0);
+    API.pointCameraAtEntity(newcam, dealership_1_display_car, offset2);*/
     catalog_menu.Visible = false;
     confirm_menu.Clear();
     confirm_menu.AddItem(API.createMenuItem("Purchase for $" + formatNumber(price) + "?", name));
@@ -48,12 +70,25 @@ confirm_menu.OnItemSelect.connect(function (sender, item, index) {
     {
         confirm_menu.Visible = false;
         catalog_menu.Visible = true;
+        API.deleteEntity(dealership_1_display_car);
+        var newpos = new Vector3(-61.70732, -1093.239, 25.5);
+        API.setEntityPosition(API.getLocalPlayer(), newpos);
+        //API.setActiveCamera(oldcam);
+        inside_car_showroom = false;
     }
     else
     {
         for (var i = 0; i < dealership_cars.length; i++) {
             if (dealership_cars[i].name === confirm_menu.MenuItems[index].Description) {
-                API.triggerServerEvent("purchase_car", dealership_cars[i].veh_name, dealership_cars[i].price, dealership_cars[i].name);
+                API.triggerServerEvent("purchase_car", dealership_cars[i].veh_name, dealership_cars[i].price, dealership_cars[i].name, dealership_cars[i].dealership);
+                if (dealership_1_display_car !== null)
+                {
+                    API.deleteEntity(dealership_1_display_car);
+                    var newpos = new Vector3(-61.70732, -1093.239, 25.5);
+                    API.setEntityPosition(API.getLocalPlayer(), newpos);
+                    //API.setActiveCamera(oldcam);
+                    inside_car_showroom = false;
+                }
                 break;
             }
         }
@@ -201,6 +236,7 @@ API.onServerEventTrigger.connect(function (eventName, args) {
         case 'sync_vehicle_door_damage':
             if (args[2] === true)
                 API.callNative('0xD4D4F6A4AB575A33', args[1], args[0], true);
+            break;rsor(true);
             break;
         /*case 'trythis':
             var pos = API.returnNative('0x44A8FCB8ED227738', 5, args[0], 3);
@@ -215,6 +251,9 @@ API.onServerEventTrigger.connect(function (eventName, args) {
 
 var call_midair = false;
 var max_height = 0.0;
+
+var oldTime = API.getGameTime();
+var isClosing = true;
 
 API.onUpdate.connect(function () {
     API.drawMenu(anim_menu);
@@ -231,22 +270,18 @@ API.onUpdate.connect(function () {
         else if (is_veh_allwheels === false) {
             API.callNative("SET_VEHICLE_OUT_OF_CONTROL", API.getPlayerVehicle(API.getLocalPlayer()), false, false);
             var newheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
-            if(newheight >= max_height)
-            {
+            if (newheight >= max_height) {
                 max_height = newheight;
             }
-            else
-            {
+            else {
                 call_midair = true;
             }
         }
-        if(is_veh_allwheels === true && call_midair === true)
-        {
+        if (is_veh_allwheels === true && call_midair === true) {
 
             var currheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
             var diff = Math.abs(max_height - currheight);
-            if(diff > 1.0)
-            {
+            if (diff > 2.0) {
                 API.triggerServerEvent("explode");
             }
             API.sendChatMessage("Difference: " + diff);
@@ -255,6 +290,7 @@ API.onUpdate.connect(function () {
         }
     }
 });
+
 
 API.onKeyUp.connect(function (sender, e) {
     if(API.isPlayerInAnyVehicle(API.getLocalPlayer()))
@@ -266,6 +302,15 @@ API.onKeyUp.connect(function (sender, e) {
             }
             else if (e.KeyCode === Keys.K) {
                 API.triggerServerEvent("indicator_right");
+            }
+            else if (e.KeyCode === Keys.F && inside_car_showroom === true)
+            {
+                confirm_menu.Visible = false;
+                catalog_menu.Visible = true;
+                API.deleteEntity(dealership_1_display_car);
+                var newpos = new Vector3(-61.70732, -1093.239, 25.5);
+                API.setEntityPosition(API.getLocalPlayer(), newpos);
+                inside_car_showroom = false;
             }
         }
     }
