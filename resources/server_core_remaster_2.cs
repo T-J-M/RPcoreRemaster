@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using GTANetworkServer;
 using GTANetworkShared;
 using System.Net;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Driver.Core;
 
 public class server_core_remaster_2 : Script
 {
@@ -27,6 +30,8 @@ public class server_core_remaster_2 : Script
         timer.Elapsed += timer_Elapsed;
         timer.AutoReset = true;
         timer.Enabled = true;
+
+        
     }
 
     public void applyPaychecks()
@@ -175,20 +180,20 @@ public class server_core_remaster_2 : Script
 
     public struct ObjectData
     {
-        public int id;
-        public int obj_id;
-        public NetHandle obj;
-        public SphereColShape coll_shape;
-        public bool is_static;
-        public string name;
-        public ObjectData(int id_par, int obj_id_par, NetHandle obj_par, bool is_static_par, string name_par)
+        public int id { get; set; }
+        public int obj_id { get; set; }
+        public NetHandle obj { get; set; }
+        public SphereColShape coll_shape { get; set; }
+        public bool is_static { get; set; }
+        public string name { get; set; }
+        public ObjectData(int id_par, int obj_id_par, NetHandle obj_par, bool is_static_par, string name_par) : this()
         {
-            id = id_par;
-            obj_id = obj_id_par;
-            obj = obj_par;
-            is_static = is_static_par;
-            name = name_par;
-            coll_shape = null;
+            this.id = id_par;
+            this.obj_id = obj_id_par;
+            this.obj = obj_par;
+            this.is_static = is_static_par;
+            this.name = name_par;
+            this.coll_shape = null;
         }
     }
 
@@ -241,50 +246,50 @@ public class server_core_remaster_2 : Script
 
     public struct PlayerData
     {
-        public Client player_client;
-        public int player_id;
-        public string player_display_name;
-        public string player_game_name;
-        public string player_password;
+        public Client player_client { get; set; }
+        public int player_id { get; set; }
+        public string player_display_name { get; set; }
+        public string player_game_name { get; set; }
+        public string player_password { get; set; }
 
-        public bool player_online;
-        public bool player_logged;
-        public bool player_registered;
+        public bool player_online { get; set; }
+        public bool player_logged { get; set; }
+        public bool player_registered { get; set; }
 
-        public Vector3 player_position;
-        public Vector3 player_rotation;
-        public PedHash player_ped_hash;
-        public long player_money_bank;
-        public long player_money_hand;
-        public long player_paycheck;
-        public string player_faction;
+        public Vector3 player_position { get; set; }
+        public Vector3 player_rotation { get; set; }
+        public PedHash player_ped_hash { get; set; }
+        public long player_money_bank { get; set; }
+        public long player_money_hand { get; set; }
+        public long player_paycheck { get; set; }
+        public string player_faction { get; set; }
 
-        public int player_vehicles_owned;
+        public int player_vehicles_owned { get; set; }
 
-        public List<ObjectData> player_inventory;
+        public List<ObjectData> player_inventory { get; set; }
 
-        public PlayerData(Client player, int id, PedHash ped_hash, string player_name, string display_name, string password)
+        public PlayerData(Client player, int id, PedHash ped_hash, string player_name, string display_name, string password) : this()
         {
-            player_client = player;
-            player_id = id;
-            player_display_name = display_name;
-            player_game_name = player_name;
-            player_password = password;
+            this.player_client = player;
+            this.player_id = id;
+            this.player_display_name = display_name;
+            this.player_game_name = player_name;
+            this.player_password = password;
 
-            player_online = true;
-            player_logged = false;
-            player_registered = false;
+            this.player_online = true;
+            this.player_logged = false;
+            this.player_registered = false;
 
-            player_position = new Vector3(0.0, 0.0, 0.0);
-            player_rotation = new Vector3(0.0, 0.0, 0.0);
-            player_ped_hash = ped_hash;
-            player_money_bank = 0;
-            player_money_hand = 0;
-            player_paycheck = 0;
-            player_faction = "civillian";
+            this.player_position = new Vector3(0.0, 0.0, 0.0);
+            this.player_rotation = new Vector3(0.0, 0.0, 0.0);
+            this.player_ped_hash = ped_hash;
+            this.player_money_bank = 0;
+            this.player_money_hand = 0;
+            this.player_paycheck = 0;
+            this.player_faction = "civillian";
 
-            player_vehicles_owned = 0;
-            player_inventory = new List<ObjectData>();
+            this.player_vehicles_owned = 0;
+            this.player_inventory = new List<ObjectData>();
         }
     }
 
@@ -338,6 +343,7 @@ public class server_core_remaster_2 : Script
     };
 
     public List<ObjectData> object_database = new List<ObjectData>();
+
     public List<PlayerData> player_database = new List<PlayerData>();
     public List<VehicleData> vehicle_database = new List<VehicleData>();
     public List<Blip> blip_database = new List<Blip>();
@@ -434,10 +440,20 @@ public class server_core_remaster_2 : Script
         string IP = webClient.DownloadString("http://api.ipify.org/");
         API.consoleOutput("IP: " + IP);
 
+        datatest tr = new datatest();
+        tr.plr_id = 5.5;
+
+        MongoClient client = new MongoClient();
+        var db = client.GetDatabase("PlayerDatabase");
+        var collection = db.GetCollection<datatest>("PlayerData");
+
+        collection.InsertOne(tr);
+
         API.requestIpl("shr_int");
         API.removeIpl("fakeint");
 
     }
+
     public int getPlayerCount()
     {
         int online = 0;
@@ -667,6 +683,10 @@ public class server_core_remaster_2 : Script
             API.setEntitySyncedData(entity, "tyre_5_popped", false);
         }
     }
+    public class datatest
+    {
+        public double plr_id { get; set; }
+    }
 
     public void OnPlayerDisconnectedHandler(Client player,string reason)
     {
@@ -687,6 +707,7 @@ public class server_core_remaster_2 : Script
         player_data.player_position = API.getEntityPosition(player);
         player_data.player_rotation = API.getEntityRotation(player);
         player_database[index] = player_data;
+
     }
 
     public void OnChatMessageHandler(Client player, string message, CancelEventArgs e)

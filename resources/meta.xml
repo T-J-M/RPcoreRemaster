@@ -3,5 +3,9 @@
 
   <script src="server_core_remaster_2.cs" type="server" lang="csharp" />
   <script src="client_core_remaster.js" type="client" lang="javascript" />
-  
+  <assembly ref="System.XML.dll"/>
+  <assembly ref="MongoDB.Bson.dll"/>
+  <assembly ref="MongoDB.Driver.dll"/>
+  <assembly ref="MongoDB.Driver.Core.dll"/>
+  <assembly ref="System.Runtime.InteropServices.RuntimeInformation.dll"/>
 </meta>
