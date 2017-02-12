@@ -66,11 +66,11 @@ public class server_core_remaster_2 : Script
 
     void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
-        if(DateTime.Now.Minute == 52)
+        if(DateTime.Now.Minute == 00)
         {
             applyPaychecks();
         }
-        else if(DateTime.Now.Minute != 52 && timer_debouce == false)
+        else if(DateTime.Now.Minute != 00 && timer_debouce == false)
         {
             timer_debouce = true;
         }
