@@ -797,10 +797,6 @@ public class server_core_remaster_2 : Script
                 API.sendChatMessageToPlayer(player, "You cannot afford this vehicle!");
             }
         }
-        else if(eventName == "actright")
-        {
-            atleastMeAndCashGetTheActRight(player, (NetHandle)args[0], (NetHandle)args[1], Convert.ToDouble(args[2]), Convert.ToDouble(args[3]));
-        }
         else if(eventName == "explode")
         {
             //API.popVehicleTyre(API.getPlayerVehicle(player), 1, true);
@@ -823,17 +819,6 @@ public class server_core_remaster_2 : Script
             API.setEntityPosition(player, new Vector3(-61.70732, -1093.239, 26));
             dealership_dim--;
         }
-    }
-
-    public void atleastMeAndCashGetTheActRight(Client player, NetHandle ent, NetHandle entT, double z1, double z2)
-    {
-        double height = Math.Abs(z1 - z2);
-        API.sendChatMessageToPlayer(player, "Height: " + height);
-        API.attachEntityToEntity(ent, entT, "bodyshell", new Vector3(0.0, 0.0, height), new Vector3(0.0, 0.0, 0.0));
-
-        //SET_VEHICLE_TYRE_BURST(Vehicle vehicle, int index, BOOL onRim,
-  //float p3) //
-        
     }
 
     [Command("cef")]
@@ -2015,7 +2000,7 @@ public class server_core_remaster_2 : Script
     }
 
     [Command("place", "Usage: /place ~b~(object name)", GreedyArg = true)]
-    public void spawnConeFunc(Client player, string item)
+    public void spawnItemFunc(Client player, string item)
     {
         item = item.ToLower();
         int indx = getPlayerDatabaseIndexByClient(player);
@@ -2071,7 +2056,7 @@ public class server_core_remaster_2 : Script
     }
 
     [Command("pickup")]
-    public void deleteConeFunc(Client player)
+    public void deleteItemFunc(Client player)
     {
         int indx = getPlayerDatabaseIndexByClient(player);
         if (!API.isPlayerInAnyVehicle(player))
