@@ -197,7 +197,7 @@ public class server_core_remaster_2 : Script
     {
         public Vehicle vehicle_object;
         public int vehicle_id;
-
+        public string car_model_name;
 
         public bool vehicle_engine;
         public bool vehicle_locked;
@@ -214,15 +214,19 @@ public class server_core_remaster_2 : Script
 
         public List<ObjectData> vehicle_inventory;
 
-        public VehicleData(Vehicle hash, int id, Vector3 pos, Vector3 rot, string license, string owner, string faction)
+        public VehicleData(Vehicle hash, int id, string model_name, Vector3 pos, Vector3 rot, string license, string owner, string faction)
         {
             vehicle_object = hash;
             vehicle_id = id;
+
+            car_model_name = model_name;
+
             vehicle_position = pos;
             vehicle_rotation = rot;
             vehicle_license = license;
             vehicle_owner = owner;
             vehicle_faction = faction;
+            
 
             vehicle_engine = false;
             vehicle_locked = true;
@@ -1067,8 +1071,7 @@ public class server_core_remaster_2 : Script
             else
                 hash = API.createVehicle(API.vehicleNameToModel(carname), API.getEntityPosition(player), API.getEntityRotation(player), 0, 0, dim);
             //API.setVehicleNumberPlate(hash, "TJM");
-            VehicleData temp = new VehicleData(hash, getRandomIDVehiclePool(), API.getEntityPosition(hash), API.getEntityRotation(hash), "tjm000", player_database[indx].player_display_name, "civillian");
-
+            VehicleData temp = new VehicleData(hash, getRandomIDVehiclePool(), carname, API.getEntityPosition(hash), API.getEntityRotation(hash), "tjm000", player_database[indx].player_display_name, "civillian");
             API.setEntitySyncedData(temp.vehicle_object, "id", (int)temp.vehicle_id);
             API.setEntitySyncedData(temp.vehicle_object, "owner", (string)temp.vehicle_owner);
             API.setEntitySyncedData(temp.vehicle_object, "plate", (string)temp.vehicle_license);
