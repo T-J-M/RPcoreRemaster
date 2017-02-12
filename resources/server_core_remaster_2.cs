@@ -6,6 +6,8 @@ using System.Net;
 
 public class server_core_remaster_2 : Script
 {
+    static System.Timers.Timer timer;
+    public bool timer_debouce = true;
     public server_core_remaster_2()
     {
         API.onResourceStart += OnResourceStartHandler;
@@ -20,6 +22,58 @@ public class server_core_remaster_2 : Script
         API.setBlipScale(newblip, 1.0f);
 
         blip_database.Add(newblip);
+
+        timer = new System.Timers.Timer(10000);
+        timer.Elapsed += timer_Elapsed;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
+
+    public void applyPaychecks()
+    {
+        if(timer_debouce)
+        {
+            timer_debouce = false;
+            for (int i = 0; i < player_database.Count; i++)
+            {
+                PlayerData temp = player_database[i];
+                if (temp.player_logged == true && temp.player_online == true)
+                {
+                    temp.player_money_bank += temp.player_paycheck;
+                    player_database[i] = temp;
+                    API.sendChatMessageToPlayer(temp.player_client, "Your paycheck of ~b~$" + temp.player_paycheck.ToString("N0") + " ~w~has come in!");
+                }
+            }
+        }
+    }
+
+    [Command("time")]
+    public void timeFunc(Client player)
+    {
+        API.sendChatMessageToPlayer(player, "Current Time: ~b~ " + DateTime.Now.ToString());
+    }
+
+    [Command("setpaycheck", GreedyArg = true)]
+    public void setPayCheckFunc(Client player, string arg)
+    {
+        long paycheck = Convert.ToInt64(arg);
+        int indx = getPlayerDatabaseIndexByClient(player);
+        PlayerData temp = player_database[indx];
+        temp.player_paycheck = paycheck;
+        player_database[indx] = temp;
+        API.sendChatMessageToPlayer(player, "Paycheck applied.");
+    }
+
+    void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        if(DateTime.Now.Minute == 52)
+        {
+            applyPaychecks();
+        }
+        else if(DateTime.Now.Minute != 52 && timer_debouce == false)
+        {
+            timer_debouce = true;
+        }
     }
 
     [Flags]
@@ -198,6 +252,7 @@ public class server_core_remaster_2 : Script
         public PedHash player_ped_hash;
         public long player_money_bank;
         public long player_money_hand;
+        public long player_paycheck;
         public string player_faction;
 
         public int player_vehicles_owned;
@@ -221,6 +276,7 @@ public class server_core_remaster_2 : Script
             player_ped_hash = ped_hash;
             player_money_bank = 0;
             player_money_hand = 0;
+            player_paycheck = 0;
             player_faction = "civillian";
 
             player_vehicles_owned = 0;
@@ -2128,9 +2184,7 @@ public class server_core_remaster_2 : Script
     public void testFunc(Client player)
     {
         NetHandle veh = API.getPlayerVehicle(player);
-        API.setVehicleWheelType(veh, 6);
-        API.setVehicleMod(veh, 23, 10);
-        //API.setVehicleMod(veh, 24, 10);
+
     }
 }
 
