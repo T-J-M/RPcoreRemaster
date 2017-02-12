@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GTANetworkServer;
 using GTANetworkShared;
 using System.Threading;
+using NativeUI;
 
 public class server_core_remaster : Script
 {
@@ -1862,6 +1863,52 @@ public class server_core_remaster : Script
         API.setEntityCollisionless(player, true);
         API.triggerClientEvent(player, "delete_all_labels");
 
-        
+        UIMenu tit;
+        tit.Title.Color = System.Drawing.Color.White;
     }
 }
+
+var call_midair = false;
+var max_height = 0.0;
+
+
+API.onUpdate.connect(function()
+{
+    if (API.isPlayerInAnyVehicle(API.getLocalPlayer()) === true)
+    {
+        var is_onroof_stuck = API.returnNative("IS_VEHICLE_STUCK_ON_ROOF", 8, API.getPlayerVehicle(API.getLocalPlayer()));
+        var is_veh_allwheels = API.returnNative("IS_VEHICLE_ON_ALL_WHEELS", 8, API.getPlayerVehicle(API.getLocalPlayer()));
+        if (is_onroof_stuck === true)
+        {
+            API.callNative("SET_VEHICLE_OUT_OF_CONTROL", API.getPlayerVehicle(API.getLocalPlayer()), false, false);
+        }
+        else if (is_veh_allwheels === false)
+        {
+            API.callNative("SET_VEHICLE_OUT_OF_CONTROL", API.getPlayerVehicle(API.getLocalPlayer()), false, false);
+
+            var newheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
+            if (newheight > max_height)
+            {
+                max_height = newheight;
+            }
+            else
+            {
+                call_midair = true;
+            }
+        }
+
+        if (is_veh_allwheels === true && call_midair === true)
+        {
+
+            var currheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
+            var diff = Math.abs(max_height - currheight);
+            if (diff > 2.0)
+            {
+                API.triggerServerEvent("explode"); //explode random tyres
+            }
+            API.sendChatMessage("Difference: " + diff);
+            max_height = 0.0;
+            call_midair = false;
+        }
+    }
+});

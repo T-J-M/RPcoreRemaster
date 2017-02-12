@@ -1,23 +1,33 @@
 ﻿var anim_menu = API.createMenu("Animation List", "Category", 0, 0, 6);
-var anim_sub_menu = API.createMenu("-null_category-", "Name(s)", 0, 0, 6);
+var anim_sub_menu = API.createMenu("-null_category-", "Name(s): ", 0, 0, 6);
 var catalog_menu = API.createMenu("-null_catalog-", "-null_types-", 0, 0, 6);
 var confirm_menu = API.createMenu("Purchase", "Confirm purchase:", 0, 0, 6);
+var showroom_menu = API.createMenu("Vehicle Control", "Part(s): ", 0, 0, 3);
 anim_menu.ResetKey(menuControl.Back);
 catalog_menu.ResetKey(menuControl.Back);
 anim_sub_menu.ResetKey(menuControl.Back);
 confirm_menu.ResetKey(menuControl.Back);
+showroom_menu.ResetKey(menuControl.Back);
 
-anim_menu.AddItem(API.createMenuItem("Sitting", "Name(s): sit"));
-anim_menu.AddItem(API.createMenuItem("Standing", "Name(s): clean, clipboard1, clipboard2"));
-anim_menu.AddItem(API.createMenuItem("Phone", "Name(s): phone1, phone2, phone3"));
-anim_menu.AddItem(API.createMenuItem("Ground", "Name(s): checkbody1, checkbody2"));
-anim_menu.AddItem(API.createMenuItem("Leaning", "Name(s): lean, leanfoot, leancar"));
-anim_menu.AddItem(API.createMenuItem("Surrender", "Name(s): handsup, handsupknees"));
-anim_menu.AddItem(API.createMenuItem("Smoking", "Name(s): smoke1, smoke2"));
-anim_menu.AddItem(API.createMenuItem("Drinking", "Name(s): coffee1, coffee2"));
-anim_menu.AddItem(API.createMenuItem("Social", "Name(s): guitar, drums"));
-anim_menu.AddItem(API.createMenuItem("Stop", "Stop playing animation"));
-anim_menu.AddItem(API.createMenuItem("Exit", "Close menu"));
+anim_menu.AddItem(API.createMenuItem("Sitting", "Name(s): sit."));
+anim_menu.AddItem(API.createMenuItem("Standing", "Name(s): clean, clipboard1, clipboard2."));
+anim_menu.AddItem(API.createMenuItem("Phone", "Name(s): phone1, phone2, phone3."));
+anim_menu.AddItem(API.createMenuItem("Ground", "Name(s): checkbody1, checkbody2."));
+anim_menu.AddItem(API.createMenuItem("Leaning", "Name(s): lean, leanfoot, leancar."));
+anim_menu.AddItem(API.createMenuItem("Surrender", "Name(s): handsup, handsupknees."));
+anim_menu.AddItem(API.createMenuItem("Smoking", "Name(s): smoke1, smoke2."));
+anim_menu.AddItem(API.createMenuItem("Drinking", "Name(s): coffee1, coffee2."));
+anim_menu.AddItem(API.createMenuItem("Social", "Name(s): guitar, drums."));
+anim_menu.AddItem(API.createMenuItem("Stop", "Stop playing animation."));
+anim_menu.AddItem(API.createMenuItem("Exit", "Close menu."));
+
+showroom_menu.AddItem(API.createMenuItem("Hood", "Open/close Hood."));
+showroom_menu.AddItem(API.createMenuItem("Trunk", "Open/close Trunk."));
+showroom_menu.AddItem(API.createMenuItem("Door1", "Open/close Door1."));
+showroom_menu.AddItem(API.createMenuItem("Door2", "Open/close Door2."));
+showroom_menu.AddItem(API.createMenuItem("Door3", "Open/close Door3."));
+showroom_menu.AddItem(API.createMenuItem("Door4", "Open/close Door4."));
+showroom_menu.AddItem(API.createMenuItem("Exit", "Close menu."));
 
 var dealership_cars = [];
 
@@ -34,7 +44,6 @@ function formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
 }
 
-var dealership_1_display_car = null;
 var oldcam = API.getActiveCamera();
 var inside_car_showroom = false;
 
@@ -44,10 +53,11 @@ function confirmButton(name, price, veh_name)
     var vec3 = new Vector3(-43.59027, -1098.547, 26.00982);
     var rot3 = new Vector3(-0.06739808, -0.004466934, 91.13767);
     //var cam3 = new Vector3(0.0, 0.0, 0.0);
-    dealership_1_display_car = API.createVehicle(API.vehicleNameToModel(veh_name), vec3, 0.0);
-    API.setEntityRotation(dealership_1_display_car, rot3);
-    API.setEntityPositionFrozen(dealership_1_display_car, true);
-    API.setPlayerIntoVehicle(dealership_1_display_car, -1);
+    API.triggerServerEvent("spawn_car_diff_dim", veh_name, vec3, rot3);
+    //dealership_1_display_car = API.createVehicle(API.vehicleNameToModel(veh_name), vec3, 0.0);
+    //API.setEntityRotation(dealership_1_display_car, rot3);
+    //API.setEntityPositionFrozen(dealership_1_display_car, true);
+    //API.setPlayerIntoVehicle(dealership_1_display_car, -1);
     API.setGameplayCameraActive();
     //API.setCameraRotation(API.getActiveCamera(), cam3);
     /*oldcam = API.getActiveCamera();
@@ -61,8 +71,10 @@ function confirmButton(name, price, veh_name)
     catalog_menu.Visible = false;
     confirm_menu.Clear();
     confirm_menu.AddItem(API.createMenuItem("Purchase for $" + formatNumber(price) + "?", name));
+    confirm_menu.AddItem(API.createMenuItem("Vehicle Control", "Open/close vehicle parts."));
     confirm_menu.AddItem(API.createMenuItem("Cancel", "Cancel purchase."));
     confirm_menu.Visible = true;
+
 }
 
 confirm_menu.OnItemSelect.connect(function (sender, item, index) {
@@ -70,29 +82,66 @@ confirm_menu.OnItemSelect.connect(function (sender, item, index) {
     {
         confirm_menu.Visible = false;
         catalog_menu.Visible = true;
-        API.deleteEntity(dealership_1_display_car);
-        var newpos = new Vector3(-61.70732, -1093.239, 25.5);
-        API.setEntityPosition(API.getLocalPlayer(), newpos);
+        API.triggerServerEvent("delete_car");
+        //API.deleteEntity(dealership_1_display_car);
+        //var newpos = new Vector3(-61.70732, -1093.239, 25.5);
+        //API.setEntityPosition(API.getLocalPlayer(), newpos);
         //API.setActiveCamera(oldcam);
         inside_car_showroom = false;
+    }
+    else if(item.Text === "Vehicle Control")
+    {
+        showroom_menu.Visible = true;
+        confirm_menu.Visible = false;
     }
     else
     {
         for (var i = 0; i < dealership_cars.length; i++) {
             if (dealership_cars[i].name === confirm_menu.MenuItems[index].Description) {
+                API.triggerServerEvent("delete_car");
                 API.triggerServerEvent("purchase_car", dealership_cars[i].veh_name, dealership_cars[i].price, dealership_cars[i].name, dealership_cars[i].dealership);
-                if (dealership_1_display_car !== null)
-                {
-                    API.deleteEntity(dealership_1_display_car);
-                    var newpos = new Vector3(-61.70732, -1093.239, 25.5);
-                    API.setEntityPosition(API.getLocalPlayer(), newpos);
-                    //API.setActiveCamera(oldcam);
-                    inside_car_showroom = false;
-                }
+                //API.setEntityPosition(API.getLocalPlayer(), newpos);
+                //API.setActiveCamera(oldcam);
+                inside_car_showroom = false;
                 break;
             }
         }
         confirm_menu.Visible = false;
+    }
+});
+
+showroom_menu.OnItemSelect.connect(function (sender, item, index) {
+    if(item.Text === "Exit")
+    {
+        confirm_menu.Visible = true;
+        showroom_menu.Visible = false;
+    }
+    else
+    {
+        if(item.Text === "Hood")
+        {
+            API.setVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 4, !API.getVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 4));
+        }
+        else if(item.Text === "Trunk")
+        {
+            API.setVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 5, !API.getVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 5));
+        }
+        else if(item.Text === "Door1")
+        {
+            API.setVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 0, !API.getVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 0));
+        }
+        else if(item.Text === "Door2")
+        {
+            API.setVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 1, !API.getVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 1));
+        }
+        else if(item.Text === "Door3")
+        {
+            API.setVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 2, !API.getVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 2));
+        }
+        else if(item.Text === "Door4")
+        {
+            API.setVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 3, !API.getVehicleDoorState(API.getPlayerVehicle(API.getLocalPlayer()), 3));
+        }
     }
 });
 
@@ -195,6 +244,7 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             API.sendChatMessage("catalog_list_call");
             catalog_menu.Clear();
             API.setMenuTitle(catalog_menu, args[0]);
+            catalog_menu.Title.Scale = 0.75;
             API.setMenuSubtitle(catalog_menu, args[1]);
 
             for (var i = 0; i < dealership_cars.length; i++)
@@ -236,7 +286,6 @@ API.onServerEventTrigger.connect(function (eventName, args) {
         case 'sync_vehicle_door_damage':
             if (args[2] === true)
                 API.callNative('0xD4D4F6A4AB575A33', args[1], args[0], true);
-            break;rsor(true);
             break;
         /*case 'trythis':
             var pos = API.returnNative('0x44A8FCB8ED227738', 5, args[0], 3);
@@ -260,6 +309,7 @@ API.onUpdate.connect(function () {
     API.drawMenu(anim_sub_menu);
     API.drawMenu(catalog_menu);
     API.drawMenu(confirm_menu);
+    API.drawMenu(showroom_menu);
 
     if (API.isPlayerInAnyVehicle(API.getLocalPlayer()) === true) {
         var is_onroof_stuck = API.returnNative("IS_VEHICLE_STUCK_ON_ROOF", 8, API.getPlayerVehicle(API.getLocalPlayer()));
@@ -270,13 +320,14 @@ API.onUpdate.connect(function () {
         else if (is_veh_allwheels === false) {
             API.callNative("SET_VEHICLE_OUT_OF_CONTROL", API.getPlayerVehicle(API.getLocalPlayer()), false, false);
             var newheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
-            if (newheight >= max_height) {
+            if (newheight > max_height) {
                 max_height = newheight;
             }
             else {
                 call_midair = true;
             }
         }
+
         if (is_veh_allwheels === true && call_midair === true) {
 
             var currheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
@@ -293,24 +344,24 @@ API.onUpdate.connect(function () {
 
 
 API.onKeyUp.connect(function (sender, e) {
-    if(API.isPlayerInAnyVehicle(API.getLocalPlayer()))
+    if(!API.isChatOpen())
     {
-        if(API.getPlayerVehicleSeat(API.getLocalPlayer()) == -1)
-        {
-            if (e.KeyCode === Keys.J) {
-                API.triggerServerEvent("indicator_left");
-            }
-            else if (e.KeyCode === Keys.K) {
-                API.triggerServerEvent("indicator_right");
-            }
-            else if (e.KeyCode === Keys.F && inside_car_showroom === true)
-            {
-                confirm_menu.Visible = false;
-                catalog_menu.Visible = true;
-                API.deleteEntity(dealership_1_display_car);
-                var newpos = new Vector3(-61.70732, -1093.239, 25.5);
-                API.setEntityPosition(API.getLocalPlayer(), newpos);
-                inside_car_showroom = false;
+        if (API.isPlayerInAnyVehicle(API.getLocalPlayer())) {
+            if (API.getPlayerVehicleSeat(API.getLocalPlayer()) == -1) {
+                if (e.KeyCode === Keys.J) {
+                    API.triggerServerEvent("indicator_left");
+                }
+                else if (e.KeyCode === Keys.K) {
+                    API.triggerServerEvent("indicator_right");
+                }
+                else if (e.KeyCode === Keys.F && inside_car_showroom === true) {
+                    confirm_menu.Visible = false;
+                    catalog_menu.Visible = true;
+                    API.triggerServerEvent("delete_car");
+                    var newpos = new Vector3(-61.70732, -1093.239, 25.5);
+                    API.triggerServerEvent("set_player_pos", newpos);
+                    inside_car_showroom = false;
+                }
             }
         }
     }

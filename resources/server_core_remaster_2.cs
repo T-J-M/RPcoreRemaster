@@ -14,7 +14,6 @@ public class server_core_remaster_2 : Script
         API.onChatMessage += OnChatMessageHandler;
         API.onChatCommand += OnChatCommandHandler;
         API.onPlayerDisconnected += OnPlayerDisconnectedHandler;
-
         Blip newblip = API.createBlip(new Vector3(-61.70732, -1093.239, 26.4819));
         API.setBlipSprite(newblip, 380);
         API.setBlipColor(newblip, 47);
@@ -115,11 +114,17 @@ public class server_core_remaster_2 : Script
         new ColorData("Pink", new int[]  {135, 136, 137}),
     };
 
+    public int[] common_car_colors = new int[]
+    {
+        2, 5, 7, 20, 25, 60, 113, 122, 78
+    };
+
     public struct ObjectData
     {
         public int id;
         public int obj_id;
         public NetHandle obj;
+        public SphereColShape coll_shape;
         public bool is_static;
         public string name;
         public ObjectData(int id_par, int obj_id_par, NetHandle obj_par, bool is_static_par, string name_par)
@@ -129,6 +134,7 @@ public class server_core_remaster_2 : Script
             obj = obj_par;
             is_static = is_static_par;
             name = name_par;
+            coll_shape = null;
         }
     }
 
@@ -432,10 +438,9 @@ public class server_core_remaster_2 : Script
     }
 
     //Rotate vector around another vector
-    Vector3 rotatedVector(Vector3 src, Vector3 center, double angle)
+    Vector3 rotatedVector(Vector3 src, Vector3 center, double angle, double radius)
     {
         Vector3 res = new Vector3(0.0, 0.0, 0.0);
-        double radius = 0.75;
         res.X = Convert.ToSingle(Math.Cos(DegreeToRadian(angle)) * radius + center.X);
         res.Y = Convert.ToSingle(Math.Sin(DegreeToRadian(angle)) * radius + center.Y);
         res.Z = center.Z;
@@ -512,7 +517,96 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    public void ExplodeAllTiresShape(ColShape shape, NetHandle entity)
+    {
+        ExplodeAllTires(entity);
+    }
 
+    public void ExplodeAllTires(NetHandle entity)
+    {
+        if (API.getEntityType(entity) == EntityType.Vehicle)
+        {
+            if (randomBool())
+            {
+                if (API.getEntitySyncedData(entity, "tyre_0_popped") != null)
+                {
+                    if (API.getEntitySyncedData(entity, "tyre_0_popped") == false)
+                    {
+                        API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 0, true, 1000.0);
+                        API.setEntitySyncedData(entity, "tyre_0_popped", true);
+                    }
+                }
+            }
+            if (randomBool())
+            {
+                if (API.getEntitySyncedData(entity, "tyre_1_popped") != null)
+                {
+                    if (API.getEntitySyncedData(entity, "tyre_1_popped") == false)
+                    {
+                        API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 1, true, 1000.0);
+                        API.setEntitySyncedData(entity, "tyre_1_popped", true);
+                    }
+                }
+            }
+            if (randomBool())
+            {
+                if (API.getEntitySyncedData(entity, "tyre_2_popped") != null)
+                {
+                    if (API.getEntitySyncedData(entity, "tyre_2_popped") == false)
+                    {
+                        API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 2, true, 1000.0);
+                        API.setEntitySyncedData(entity, "tyre_2_popped", true);
+                    }
+                }
+            }
+            if (randomBool())
+            {
+                if (API.getEntitySyncedData(entity, "tyre_3_popped") != null)
+                {
+                    if (API.getEntitySyncedData(entity, "tyre_3_popped") == false)
+                    {
+                        API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 3, true, 1000.0);
+                        API.setEntitySyncedData(entity, "tyre_3_popped", true);
+                    }
+                }
+            }
+            if (randomBool())
+            {
+                if (API.getEntitySyncedData(entity, "tyre_4_popped") != null)
+                {
+                    if (API.getEntitySyncedData(entity, "tyre_4_popped") == false)
+                    {
+                        API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 4, true, 1000.0);
+                        API.setEntitySyncedData(entity, "tyre_4_popped", true);
+                    }
+                }
+            }
+            if (randomBool())
+            {
+                if (API.getEntitySyncedData(entity, "tyre_5_popped") != null)
+                {
+                    if (API.getEntitySyncedData(entity, "tyre_5_popped") == false)
+                    {
+                        API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 5, true, 1000.0);
+                        API.setEntitySyncedData(entity, "tyre_5_popped", true);
+                    }
+                }
+            }
+        }
+    }
+
+    public void setRepairedTyres(NetHandle entity)
+    {
+        if(API.getEntityType(entity) == EntityType.Vehicle)
+        {
+            API.setEntitySyncedData(entity, "tyre_0_popped", false);
+            API.setEntitySyncedData(entity, "tyre_1_popped", false);
+            API.setEntitySyncedData(entity, "tyre_2_popped", false);
+            API.setEntitySyncedData(entity, "tyre_3_popped", false);
+            API.setEntitySyncedData(entity, "tyre_4_popped", false);
+            API.setEntitySyncedData(entity, "tyre_5_popped", false);
+        }
+    }
 
     public void OnPlayerDisconnectedHandler(Client player,string reason)
     {
@@ -586,11 +680,12 @@ public class server_core_remaster_2 : Script
         lock (syncLock)
         { // synchronize
             int prob = rnd.Next(100);
-            return prob <= 80;
+            return prob <= 70;
         }
     }
 
     public int dealership_1_spawn_counter = 0;
+    public int dealership_dim = 0;
 
     public void OnClientEventTriggerHandler(Client player, string eventName, params object[] args)
     {
@@ -619,7 +714,7 @@ public class server_core_remaster_2 : Script
             if (player_database[index].player_money_bank - Convert.ToInt64(args[1]) >= 0)
             {
                 long prc = Convert.ToInt64(args[1]);
-                API.sendChatMessageToPlayer(player, "Purchased " + args[2] + " for $" + prc.ToString("N0") + "!");
+                API.sendChatMessageToPlayer(player, "Purchased ~b~" + args[2] + "~w~ for ~b~$" + prc.ToString("N0") + "~w~!");
 
                 PlayerData temp = player_database[index];
                 temp.player_money_bank -= prc;
@@ -627,7 +722,8 @@ public class server_core_remaster_2 : Script
 
                 if((string)args[3] == "dealership_1")
                 {
-                    spawnCar(player, (string)args[0], true, dealership_1_spawn_locations[dealership_1_spawn_counter].pos, dealership_1_spawn_locations[dealership_1_spawn_counter].rot);
+                    int color_indx = rnd.Next(0, common_car_colors.Length);
+                    spawnCar(player, (string)args[0], true, dealership_1_spawn_locations[dealership_1_spawn_counter].pos, dealership_1_spawn_locations[dealership_1_spawn_counter].rot, common_car_colors[color_indx], common_car_colors[color_indx], true, 0);
                     dealership_1_spawn_counter++;
                     if (dealership_1_spawn_counter >= dealership_1_spawn_locations.Length)
                     {
@@ -638,7 +734,7 @@ public class server_core_remaster_2 : Script
             }
             else
             {
-                API.sendChatMessageToPlayer(player, "You cannot afford this!");
+                API.sendChatMessageToPlayer(player, "You cannot afford this vehicle!");
             }
         }
         else if(eventName == "actright")
@@ -650,18 +746,22 @@ public class server_core_remaster_2 : Script
             //API.popVehicleTyre(API.getPlayerVehicle(player), 1, true);
             //API.sendNativeToPlayer(player, GTANetworkServer.Hash.STEER_UNLOCK_BIAS, API.getPlayerVehicle(player), true);
             //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_STEER_BIAS, API.getPlayerVehicle(player), 0.0);
-            if(randomBool())
-                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 0, true, 1000.0);
-            if (randomBool())
-                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 1, true, 1000.0);
-            if (randomBool())
-                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 2, true, 1000.0);
-            if (randomBool())
-                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 3, true, 1000.0);
-            if (randomBool())
-                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 4, true, 1000.0);
-            if (randomBool())
-                API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, API.getPlayerVehicle(player), 5, true, 1000.0);
+            ExplodeAllTires(API.getPlayerVehicle(player));
+        }
+        else if(eventName == "spawn_car_diff_dim")
+        {
+            dealership_dim++;
+            spawnCar(player, (string)args[0], true, (Vector3)args[1], (Vector3)args[2], 0, 0, false, dealership_dim);
+        }
+        else if(eventName == "delete_car")
+        {
+            //API.deleteEntity((NetHandle)args[0]);
+            NetHandle plr_veh = API.getPlayerVehicle(player);
+            API.deleteEntity(plr_veh);
+
+            API.setEntityDimension(player, 0);
+            API.setEntityPosition(player, new Vector3(-61.70732, -1093.239, 26));
+            dealership_dim--;
         }
     }
 
@@ -896,43 +996,58 @@ public class server_core_remaster_2 : Script
     [Command("spawncar", GreedyArg = true)]
     public void spawnCarFunc(Client player, string carname)
     {
-        spawnCar(player, carname, false, new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0));
+        spawnCar(player, carname, false, new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0), 0, 0, true, 0);
     }
 
-    public void spawnCar(Client player, string carname, bool forcePos, Vector3 pos, Vector3 rot)
+    public void spawnCar(Client player, string carname, bool forcePos, Vector3 pos, Vector3 rot, int color1, int color2, bool owned, int dim)
     {
-        int indx = getPlayerDatabaseIndexByClient(player);
-        API.sendChatMessageToPlayer(player, "Spawned car!");
-        Vehicle hash;
-        if(forcePos)
-            hash = API.createVehicle(API.vehicleNameToModel(carname), pos, rot, 0, 0);
-        else
-            hash = API.createVehicle(API.vehicleNameToModel(carname), API.getEntityPosition(player), API.getEntityRotation(player), 0, 0);
-        //API.setVehicleNumberPlate(hash, "TJM");
-        VehicleData temp = new VehicleData(hash, getRandomIDVehiclePool(), API.getEntityPosition(hash), API.getEntityRotation(hash), "tjm000", player_database[indx].player_display_name, "civillian");
+        if(owned)
+        {
+            int indx = getPlayerDatabaseIndexByClient(player);
+            API.sendChatMessageToPlayer(player, "Spawned car!");
+            Vehicle hash;
+            if (forcePos)
+                hash = API.createVehicle(API.vehicleNameToModel(carname), pos, rot, 0, 0, dim);
+            else
+                hash = API.createVehicle(API.vehicleNameToModel(carname), API.getEntityPosition(player), API.getEntityRotation(player), 0, 0, dim);
+            //API.setVehicleNumberPlate(hash, "TJM");
+            VehicleData temp = new VehicleData(hash, getRandomIDVehiclePool(), API.getEntityPosition(hash), API.getEntityRotation(hash), "tjm000", player_database[indx].player_display_name, "civillian");
 
-        API.setEntitySyncedData(temp.vehicle_object, "id", (int)temp.vehicle_id);
-        API.setEntitySyncedData(temp.vehicle_object, "owner", (string)temp.vehicle_owner);
-        API.setEntitySyncedData(temp.vehicle_object, "plate", (string)temp.vehicle_license);
-        API.setEntitySyncedData(temp.vehicle_object, "engine", false);
-        API.setEntitySyncedData(temp.vehicle_object, "indicator_right", false);
-        API.setEntitySyncedData(temp.vehicle_object, "indicator_left", false);
-        API.setEntitySyncedData(temp.vehicle_object, "locked", true);
-        API.setEntitySyncedData(temp.vehicle_object, "trunk", false);
-        API.setEntitySyncedData(temp.vehicle_object, "hood", false);
-        API.setEntitySyncedData(temp.vehicle_object, "door1", false);
-        API.setEntitySyncedData(temp.vehicle_object, "door2", false);
-        API.setEntitySyncedData(temp.vehicle_object, "door3", false);
-        API.setEntitySyncedData(temp.vehicle_object, "door4", false);
-        API.setEntitySyncedData(temp.vehicle_object, "attached", false);
-        API.setVehicleNumberPlate(temp.vehicle_object, (string)temp.vehicle_license);
-        API.setVehicleEngineStatus(temp.vehicle_object, false);
-        API.setVehicleLocked(temp.vehicle_object, true);
-        vehicle_database.Add(temp);
-        PlayerData plr = player_database[indx];
-        plr.player_vehicles_owned++;
-        player_database[indx] = plr;
-        API.setPlayerIntoVehicle(player, hash, -1);
+            API.setEntitySyncedData(temp.vehicle_object, "id", (int)temp.vehicle_id);
+            API.setEntitySyncedData(temp.vehicle_object, "owner", (string)temp.vehicle_owner);
+            API.setEntitySyncedData(temp.vehicle_object, "plate", (string)temp.vehicle_license);
+            API.setEntitySyncedData(temp.vehicle_object, "engine", false);
+            API.setEntitySyncedData(temp.vehicle_object, "indicator_right", false);
+            API.setEntitySyncedData(temp.vehicle_object, "indicator_left", false);
+            API.setEntitySyncedData(temp.vehicle_object, "locked", true);
+            API.setEntitySyncedData(temp.vehicle_object, "trunk", false);
+            API.setEntitySyncedData(temp.vehicle_object, "hood", false);
+            API.setEntitySyncedData(temp.vehicle_object, "door1", false);
+            API.setEntitySyncedData(temp.vehicle_object, "door2", false);
+            API.setEntitySyncedData(temp.vehicle_object, "door3", false);
+            API.setEntitySyncedData(temp.vehicle_object, "door4", false);
+            API.setEntitySyncedData(temp.vehicle_object, "attached", false);
+            API.setVehicleNumberPlate(temp.vehicle_object, (string)temp.vehicle_license);
+            API.setVehicleEngineStatus(temp.vehicle_object, false);
+            API.setVehicleLocked(temp.vehicle_object, true);
+            API.setVehiclePrimaryColor(temp.vehicle_object, color1);
+            API.setVehicleSecondaryColor(temp.vehicle_object, color2);
+            vehicle_database.Add(temp);
+            PlayerData plr = player_database[indx];
+            plr.player_vehicles_owned++;
+            player_database[indx] = plr;
+            API.setPlayerIntoVehicle(player, hash, -1);
+        }
+        else
+        {
+            Vehicle hash = API.createVehicle(API.vehicleNameToModel(carname), pos, rot, 0, 0, dim);
+            API.setEntityDimension(player, dim);
+            API.setPlayerIntoVehicle(player, hash, -1);
+            API.setEntityPositionFrozen(hash, true);
+            //API.setEntityDimension(hash, dim);
+            //API.setEntityDimension(player, dim);
+            //API.triggerClientEvent(player, "track_dim_car", hash);
+        }
     }
 
     [Command("stats")]
@@ -1857,14 +1972,34 @@ public class server_core_remaster_2 : Script
                     // RandomIDObjectPool.RemoveAt(0);
                     ObjectData temp = player_database[indx].player_inventory[i];
                     temp.obj = API.createObject(temp.obj_id, API.getEntityPosition(player) - new Vector3(0.0, 0.0, 1.0), API.getEntityRotation(player));
-                    API.setEntityPosition(temp.obj, rotatedVector(API.getEntityPosition(player) - new Vector3(0.0, 0.0, 1.0), API.getEntityPosition(player) - new Vector3(0.0, 0.0, 1.0), API.getEntityRotation(player).Z + 90.0));
+                    API.setEntityPosition(temp.obj, rotatedVector(API.getEntityPosition(player) - new Vector3(0.0, 0.0, 1.0), API.getEntityPosition(player) - new Vector3(0.0, 0.0, 1.0), API.getEntityRotation(player).Z + 90.0, 0.75));
                     API.consoleOutput("Player Z ROT: " + API.getEntityRotation(player).Z);
                     API.setEntityPositionFrozen(temp.obj, true);
                     API.setEntityCollisionless(temp.obj, true);
-                    object_database.Add(temp);
-
-
                     player_database[indx].player_inventory.RemoveAt(i);
+
+                    if (temp.name == "spike")
+                    {
+
+                        //Vector3 pos = rotatedVector(API.getEntityPosition(temp.obj), API.getEntityPosition(temp.obj), API.getEntityRotation(temp.obj).Z + 270.0, 4.75); //left
+                        //Vector3 pos2 = rotatedVector(API.getEntityPosition(temp.obj), API.getEntityPosition(temp.obj), API.getEntityRotation(temp.obj).Z + 270, -1.0); //right
+                        Vector3 pos3 = rotatedVector(API.getEntityPosition(temp.obj), API.getEntityPosition(temp.obj), API.getEntityRotation(temp.obj).Z + 270.0, 1.75); //midle
+                        //NetHandle obj = API.createObject(-1036807324, pos, new Vector3(0.0, 0.0, 0.0));
+                        //NetHandle obj2 = API.createObject(-1036807324, pos2, new Vector3(0.0, 0.0, 0.0));
+                        NetHandle obj3 = API.createObject(-1036807324, pos3, new Vector3(0.0, 0.0, 0.0));
+                        
+                        //API.setEntityCollisionless(obj, true);
+                        //API.setEntityPositionFrozen(obj, true);
+                        //API.setEntityCollisionless(obj2, true);
+                        //API.setEntityPositionFrozen(obj2, true);
+                        API.setEntityCollisionless(obj3, true);
+                        API.setEntityPositionFrozen(obj3, true);
+
+                        //temp.coll = API.createSphereColShape(pos, 4.0f);
+                        temp.coll_shape = API.createSphereColShape(pos3, 2.0f);
+                        temp.coll_shape.onEntityEnterColShape += ExplodeAllTiresShape;
+                    }
+                    object_database.Add(temp);
                     API.sendChatMessageToPlayer(player, "Placed down object: " + temp.id);
                     break;
                 }
@@ -1908,6 +2043,10 @@ public class server_core_remaster_2 : Script
                 {
                     //API.playPlayerAnimation(player, 0, "amb@medic@standing@tendtodead@idle_a", "idle_a");
                     animFunc(player, "checkbody2", false);
+                    if(object_database[obj_indx].coll_shape != null)
+                    {
+                        API.deleteColShape(object_database[obj_indx].coll_shape);
+                    }
                     object_database.RemoveAt(obj_indx);
                     player_database[indx].player_inventory.Add(closestObj);
                     API.deleteEntity(closestObj.obj);
@@ -1924,7 +2063,7 @@ public class server_core_remaster_2 : Script
     [Command("catalog")]
     public void purchaseFunc(Client player)
     {
-        if(!API.isPlayerInAnyVehicle(player))
+        if (!API.isPlayerInAnyVehicle(player))
         {
             Vector3 plr_pos = API.getEntityPosition(player);
             float smallest_dist = 100.0f;
@@ -1954,5 +2093,45 @@ public class server_core_remaster_2 : Script
         {
             API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
         }
+
+    }
+
+    [Command("repair")]
+    public void repairFunc(Client player)
+    {
+        if(API.isPlayerInAnyVehicle(player))
+        {
+            API.repairVehicle(API.getPlayerVehicle(player));
+            setRepairedTyres(API.getPlayerVehicle(player));
+        }
+    }
+
+    [Command("setcolor", GreedyArg = true)]
+    public void setColorFunc(Client player, string colorname)
+    {
+        if(API.isPlayerInAnyVehicle(player))
+        {
+            for (int i = 0; i < color_names.Length; i++)
+            {
+                if (color_names[i].color_name == colorname)
+                {
+                    int rndclr = rnd.Next(0, color_names[i].colors.Length);
+                    API.setVehiclePrimaryColor(API.getPlayerVehicle(player), color_names[i].colors[rndclr]);
+                    API.setVehicleSecondaryColor(API.getPlayerVehicle(player), color_names[i].colors[rndclr]);
+                    break;
+                }
+            }
+        }
+    }
+
+    [Command("trythis")]
+    public void testFunc(Client player)
+    {
+        NetHandle veh = API.getPlayerVehicle(player);
+        API.setVehicleWheelType(veh, 6);
+        API.setVehicleMod(veh, 23, 10);
+        //API.setVehicleMod(veh, 24, 10);
     }
 }
+
+
