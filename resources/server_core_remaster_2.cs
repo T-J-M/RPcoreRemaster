@@ -4,8 +4,14 @@ using GTANetworkServer;
 using GTANetworkShared;
 using System.Net;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Core;
+using System.Linq;
+using System.IO;
+
+
 
 public class server_core_remaster_2 : Script
 {
@@ -178,15 +184,16 @@ public class server_core_remaster_2 : Script
         2, 5, 7, 20, 25, 60, 113, 122, 78
     };
 
-    public struct ObjectData
+    public class ObjectData
     {
+        public ObjectId Id { get; set; }
         public int id { get; set; }
         public int obj_id { get; set; }
         public NetHandle obj { get; set; }
         public SphereColShape coll_shape { get; set; }
         public bool is_static { get; set; }
         public string name { get; set; }
-        public ObjectData(int id_par, int obj_id_par, NetHandle obj_par, bool is_static_par, string name_par) : this()
+        public ObjectData(int id_par, int obj_id_par, NetHandle obj_par, bool is_static_par, string name_par)
         {
             this.id = id_par;
             this.obj_id = obj_id_par;
@@ -195,11 +202,22 @@ public class server_core_remaster_2 : Script
             this.name = name_par;
             this.coll_shape = null;
         }
+
+        public ObjectData()
+        {
+            this.id = -1;
+            this.obj_id = -1;
+            this.obj = new NetHandle();
+            this.coll_shape = null;
+            this.is_static = false;
+            this.name = "";
+        }
     }
 
 
-    public struct VehicleData
+    public class VehicleData
     {
+        public ObjectId Id { get; set; }
         public Vehicle vehicle_object;
         public int vehicle_id;
         public string car_model_name;
@@ -221,31 +239,32 @@ public class server_core_remaster_2 : Script
 
         public VehicleData(Vehicle hash, int id, string model_name, Vector3 pos, Vector3 rot, string license, string owner, string faction)
         {
-            vehicle_object = hash;
-            vehicle_id = id;
+            this.vehicle_object = hash;
+            this.vehicle_id = id;
 
-            car_model_name = model_name;
+            this.car_model_name = model_name;
 
-            vehicle_position = pos;
-            vehicle_rotation = rot;
-            vehicle_license = license;
-            vehicle_owner = owner;
-            vehicle_faction = faction;
-            
+            this.vehicle_position = pos;
+            this.vehicle_rotation = rot;
+            this.vehicle_license = license;
+            this.vehicle_owner = owner;
+            this.vehicle_faction = faction;
 
-            vehicle_engine = false;
-            vehicle_locked = true;
-            vehicle_primary_color = 0;
-            vehicle_secondary_color = 0;
-            vehicle_color = "Black";
 
-            vehicle_inventory = new List<ObjectData>();
+            this.vehicle_engine = false;
+            this.vehicle_locked = true;
+            this.vehicle_primary_color = 0;
+            this.vehicle_secondary_color = 0;
+            this.vehicle_color = "Black";
+
+            this.vehicle_inventory = new List<ObjectData>();
         }
     }
 
 
-    public struct PlayerData
+    public class PlayerData
     {
+        public ObjectId Id { get; set; }
         public Client player_client { get; set; }
         public int player_id { get; set; }
         public string player_display_name { get; set; }
@@ -268,7 +287,7 @@ public class server_core_remaster_2 : Script
 
         public List<ObjectData> player_inventory { get; set; }
 
-        public PlayerData(Client player, int id, PedHash ped_hash, string player_name, string display_name, string password) : this()
+        public PlayerData(Client player, int id, PedHash ped_hash, string player_name, string display_name, string password)
         {
             this.player_client = player;
             this.player_id = id;
@@ -440,14 +459,28 @@ public class server_core_remaster_2 : Script
         string IP = webClient.DownloadString("http://api.ipify.org/");
         API.consoleOutput("IP: " + IP);
 
-        datatest tr = new datatest();
-        tr.plr_id = 5.5;
-
+        PlayerData plr = new PlayerData(null, -1, (PedHash)123, "bigballer", "Test_Mcbutt", "123");
         MongoClient client = new MongoClient();
         var db = client.GetDatabase("PlayerDatabase");
-        var collection = db.GetCollection<datatest>("PlayerData");
+        var collection = db.GetCollection<BsonDocument>("PlayerData");
+        var bsonObj = plr.ToBsonDocument();
+        collection.InsertOne(bsonObj);
 
-        collection.InsertOne(tr);
+        var filter = new BsonDocument();
+
+        using (var cursor = collection.FindSync<BsonDocument>(filter))
+        {
+            while(cursor.MoveNext())
+            {
+                var batch = cursor.Current;
+                foreach(var document in batch)
+                {
+                    var obj = BsonSerializer.Deserialize<PlayerData>(document);
+                    API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
+                    API.consoleOutput("Actual OBJ: " + obj.player_display_name);
+                }
+            }
+        }
 
         API.requestIpl("shr_int");
         API.removeIpl("fakeint");
@@ -683,10 +716,7 @@ public class server_core_remaster_2 : Script
             API.setEntitySyncedData(entity, "tyre_5_popped", false);
         }
     }
-    public class datatest
-    {
-        public double plr_id { get; set; }
-    }
+
 
     public void OnPlayerDisconnectedHandler(Client player,string reason)
     {
