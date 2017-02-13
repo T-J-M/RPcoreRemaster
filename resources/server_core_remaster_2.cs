@@ -5,6 +5,7 @@ using GTANetworkShared;
 using System.Net;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Core;
@@ -15,6 +16,9 @@ using System.IO;
 
 public class server_core_remaster_2 : Script
 {
+    public MongoClient client = new MongoClient();
+    public IMongoDatabase db;
+    public IMongoCollection<BsonDocument> collection;
     static System.Timers.Timer timer;
     public bool timer_debouce = true;
     public server_core_remaster_2()
@@ -189,6 +193,7 @@ public class server_core_remaster_2 : Script
         public ObjectId Id { get; set; }
         public int id { get; set; }
         public int obj_id { get; set; }
+        [BsonIgnore]
         public NetHandle obj { get; set; }
         public SphereColShape coll_shape { get; set; }
         public bool is_static { get; set; }
@@ -218,6 +223,7 @@ public class server_core_remaster_2 : Script
     public class VehicleData
     {
         public ObjectId Id { get; set; }
+        [BsonIgnore]
         public Vehicle vehicle_object;
         public int vehicle_id;
         public string car_model_name;
@@ -265,6 +271,8 @@ public class server_core_remaster_2 : Script
     public class PlayerData
     {
         public ObjectId Id { get; set; }
+
+        [BsonIgnore]
         public Client player_client { get; set; }
         public int player_id { get; set; }
         public string player_display_name { get; set; }
@@ -459,12 +467,11 @@ public class server_core_remaster_2 : Script
         string IP = webClient.DownloadString("http://api.ipify.org/");
         API.consoleOutput("IP: " + IP);
 
-        PlayerData plr = new PlayerData(null, -1, (PedHash)123, "bigballer", "Test_Mcbutt", "123");
-        MongoClient client = new MongoClient();
-        var db = client.GetDatabase("PlayerDatabase");
-        var collection = db.GetCollection<BsonDocument>("PlayerData");
-        var bsonObj = plr.ToBsonDocument();
-        collection.InsertOne(bsonObj);
+        //PlayerData plr = new PlayerData(null, -1, (PedHash)123, "bigballer", "Test_Mcbutt", "123");
+        db = client.GetDatabase("PlayerDatabase");
+        collection = db.GetCollection<BsonDocument>("PlayerData");
+        //var bsonObj = plr.ToBsonDocument();
+        //collection.InsertOne(bsonObj);
 
         var filter = new BsonDocument();
 
@@ -476,8 +483,9 @@ public class server_core_remaster_2 : Script
                 foreach(var document in batch)
                 {
                     var obj = BsonSerializer.Deserialize<PlayerData>(document);
-                    API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
-                    API.consoleOutput("Actual OBJ: " + obj.player_display_name);
+                    //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
+                    API.consoleOutput("Found user: " + obj.player_game_name + " -> " + obj.Id.ToString());
+                    player_database.Add(obj);
                 }
             }
         }
@@ -565,19 +573,20 @@ public class server_core_remaster_2 : Script
 
         bool found_player = false;
         int index = -1;
-        for(int i = 0; i < player_database.Count; i++)
+        for (int i = 0; i < player_database.Count; i++)
         {
-            if(player_database[i].player_game_name == player.name)
+            if (player_database[i].player_game_name == player.name)
             {
                 found_player = true;
                 index = i;
             }
         }
+        PlayerData player_data = new PlayerData(null, 01, (PedHash)123, "", "", "");
 
-        if(found_player)
+        if (found_player)
         {
             API.consoleOutput("Player (" + player.name + ") exists in database.");
-            PlayerData player_data = player_database[index];
+            player_data = player_database[index];
             player_data.player_client = player;
             player_data.player_id = getRandomIDPlayerPool();
             player_data.player_online = true;
@@ -587,10 +596,14 @@ public class server_core_remaster_2 : Script
         else
         {
             API.consoleOutput("Player (" + player.name + ") does not exist in database.");
-            PlayerData player_data = new PlayerData(player, getRandomIDPlayerPool(), API.pedNameToModel("Mani"), player.name, "test_mcbutt", "null_password");
+            player_data = new PlayerData(player, getRandomIDPlayerPool(), API.pedNameToModel("Mani"), player.name, "test_mcbutt", "null_password");
             player_database.Add(player_data);
             API.sendChatMessageToPlayer(player, "Please ~b~register ~w~using /register [firstname_lastname] [password]");
         }
+
+        var bsonObj = player_data.ToBsonDocument();
+        var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], player_data.Id);
+        var result = collection.ReplaceOne(filter, bsonObj, new UpdateOptions { IsUpsert = true });
 
         int rnd_location = rnd.Next(0, loginscreen_locations.Length);
         API.setPlayerSkin(player, API.pedNameToModel("Mani"));
@@ -605,7 +618,7 @@ public class server_core_remaster_2 : Script
         List<NetHandle> vehs = new List<NetHandle>();
         vehs = API.getAllVehicles();
 
-        for(int i = 0; i < vehs.Count; i++)
+        for (int i = 0; i < vehs.Count; i++)
         {
             if (API.getEntitySyncedData(vehs[i], "indicator_right") != null)
                 API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 0, API.getEntitySyncedData(vehs[i], "indicator_right"));
@@ -624,6 +637,26 @@ public class server_core_remaster_2 : Script
             if (API.getEntitySyncedData(vehs[i], "door4") != null)
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
         }
+
+       
+
+        /*var filter = new BsonDocument();
+
+        using (var cursor = collection.FindSync<BsonDocument>(filter))
+        {
+            while (cursor.MoveNext())
+            {
+                var batch = cursor.Current;
+                foreach (var document in batch)
+                {
+                    var obj = BsonSerializer.Deserialize<PlayerData>(document);
+                    //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
+                    API.consoleOutput("Found user: " + obj.player_game_name + " -> " + obj.Id.ToString());
+                    player_database.Add(obj);
+                }
+            }
+        }*/
+
     }
 
     public void ExplodeAllTiresShape(ColShape shape, NetHandle entity)
@@ -737,6 +770,11 @@ public class server_core_remaster_2 : Script
         player_data.player_position = API.getEntityPosition(player);
         player_data.player_rotation = API.getEntityRotation(player);
         player_database[index] = player_data;
+
+        //PlayerData plr = new PlayerData(null, -1, (PedHash)123, "bigballer", "Test_Mcbutt", "123");
+        var bsonObj = player_data.ToBsonDocument();
+        var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], player_data.Id);
+        var result = collection.ReplaceOne(filter, bsonObj, new UpdateOptions { IsUpsert = true });
 
     }
 
