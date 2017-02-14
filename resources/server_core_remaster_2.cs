@@ -16,14 +16,14 @@ using System.IO;
 
 public class server_core_remaster_2 : Script
 {
-    //Database objects
+    //Databases
     public MongoClient client = new MongoClient();
     public IMongoDatabase db_players;
     public IMongoDatabase db_vehicles;
     public IMongoCollection<BsonDocument> collection_players;
     public IMongoCollection<BsonDocument> collection_vehicles;
 
-
+    //Database lists
     public List<ObjectData> object_database = new List<ObjectData>(); //User placed objects (static/nonstatic)
     public List<PlayerData> player_database = new List<PlayerData>();  //Player data
     public List<VehicleData> vehicle_database = new List<VehicleData>(); //Vehicle data
@@ -64,6 +64,7 @@ public class server_core_remaster_2 : Script
         timer.Enabled = true;
     }
 
+    //Animation flags
     [Flags]
     public enum AnimationFlags
     {
@@ -73,7 +74,8 @@ public class server_core_remaster_2 : Script
         AllowPlayerControl = 1 << 5,
         Cancellable = 1 << 7
     }
-
+     
+    //Location used for login screen
     Vector3[] loginscreen_locations = new Vector3[]
     {
         new Vector3(-438.796, 1075.821, 353.000),
@@ -83,7 +85,7 @@ public class server_core_remaster_2 : Script
         new Vector3(1070.206, -711.958, 70.483),
     };
 
-
+    //Used for dealership spawn locations
     public struct DoubleVector3
     {
         public Vector3 pos;
@@ -95,6 +97,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //Store (dealership) data
     public struct StoreData
     {
         public string name;
@@ -111,11 +114,13 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //List of stores
     StoreData[] store_locations = new StoreData[]
     {
         new StoreData("~o~Premium Deluxe \nMotorsport", "Vehicle(s):", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
     };
 
+    //Store spawn locations
     DoubleVector3[] dealership_1_spawn_locations = new DoubleVector3[]
     {
         new DoubleVector3(new Vector3(-42.30667, -1116.657, 26.02187), new Vector3(0.05719259, -0.00925794, -0.3153604)),
@@ -127,6 +132,7 @@ public class server_core_remaster_2 : Script
         new DoubleVector3(new Vector3(-52.19479, -1106.735, 26.02584), new Vector3(-0.1178563, -0.06428397, 71.15902)),
     };
 
+    //Used for vehicle color (Categorise colors under a color name)
     public struct ColorData
     {
         public int[] colors;
@@ -139,6 +145,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //List of categorised colors
     public ColorData[] color_names = new ColorData[]
     {
         new ColorData("Black", new int[] {0, 1, 11, 12, 15, 17, 21, 22, 147}),
@@ -155,11 +162,13 @@ public class server_core_remaster_2 : Script
         new ColorData("Pink", new int[]  {135, 136, 137}),
     };
 
+    //Common cars used for dealership purchases
     public int[] common_car_colors = new int[]
     {
         2, 5, 7, 20, 25, 60, 113, 122, 78
     };
 
+    //Object data for objects spawned in the world by players
     public class ObjectData
     {
         [BsonId]
@@ -196,7 +205,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-
+    //Vehicle data
     public class VehicleData
     {
         [BsonId]
@@ -252,7 +261,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-
+    //Player data
     public class PlayerData
     {
         [BsonId]
@@ -313,7 +322,8 @@ public class server_core_remaster_2 : Script
             this.Id = ObjectId.GenerateNewId();
         }
     }
-
+    
+    //Animation data
     public struct AnimData
     {
         public string action_name; //Command action
@@ -339,6 +349,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //List of animations
     public AnimData[] anim_names = new AnimData[]
     {
         new AnimData("clean", -1, "null", new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0), (int)(AnimationFlags.Loop), "switch@franklin@cleaning_car", "001946_01_gc_fras_v2_ig_5_base"),
@@ -364,7 +375,7 @@ public class server_core_remaster_2 : Script
     };
 
 
-
+    //Utilities
     public int getPlayerDatabaseIndexByClient(Client player)
     {
         for (int i = 0; i < player_database.Count; i++)
@@ -426,10 +437,11 @@ public class server_core_remaster_2 : Script
         return x;
     }
 
-
+    //Start server
     public void OnResourceStartHandler()
     {
         API.consoleOutput("Server_Core is initialising...");
+        //Fill ID pools
         for (int i = 0; i < 1000; i++)
         {
             int temp = rnd.Next(1, 100000);
@@ -448,10 +460,12 @@ public class server_core_remaster_2 : Script
             RandomIDObjectPool.Add(temp);
         }
 
+        //test
         WebClient webClient = new WebClient();
         string IP = webClient.DownloadString("http://api.ipify.org/");
         API.consoleOutput("Public IP: " + IP);
 
+        //Fetch database
         if (client.Cluster.Description.State.ToString() == "Disconnected")
         {
             API.consoleOutput("MongoDB database is offline!");
@@ -508,9 +522,12 @@ public class server_core_remaster_2 : Script
         API.consoleOutput("Server_Core has initialised.");
     }
 
+    //Server shutdown
     public void OnResourceStopHandler()
     {
         API.consoleOutput("Server_Core is terminating...");
+
+        //Update database
         if (client.Cluster.Description.State.ToString() == "Disconnected")
         {
             API.consoleOutput("MongoDB database is offline!");
@@ -562,6 +579,7 @@ public class server_core_remaster_2 : Script
         API.sleep(2000);
     }
 
+    //Utilities
     public int getPlayerCount()
     {
         int online = 0;
@@ -693,6 +711,8 @@ public class server_core_remaster_2 : Script
         List<NetHandle> vehs = new List<NetHandle>();
         vehs = API.getAllVehicles();
 
+
+        //Sync current vehicles to user
         for (int i = 0; i < vehs.Count; i++)
         {
             if (API.getEntitySyncedData(vehs[i], "indicator_right") != null)
@@ -715,6 +735,7 @@ public class server_core_remaster_2 : Script
 
     }
 
+    //Paycheck function
     public void applyPaychecks()
     {
         if (timer_debouce)
@@ -733,6 +754,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //Used for hourly check
     void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
         if (DateTime.Now.Minute == 00)
@@ -745,6 +767,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //Car tyre damage
     public void ExplodeAllTiresShape(ColShape shape, NetHandle entity)
     {
         ExplodeAllTires(entity);
@@ -880,6 +903,7 @@ public class server_core_remaster_2 : Script
     {
         int index = getPlayerDatabaseIndexByClient(player);
         
+        //Limit users to /login and /register when they first join
 
         if(command.StartsWith("/login"))
         {
@@ -917,6 +941,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //Used for tyre burst chance
     private static readonly object syncLock = new object();
     public static bool randomBool()
     {
@@ -927,6 +952,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //Client triggers
     public void OnClientEventTriggerHandler(Client player, string eventName, params object[] args)
     {
         if(eventName == "indicator_left")
@@ -977,7 +1003,7 @@ public class server_core_remaster_2 : Script
                 API.sendChatMessageToPlayer(player, "You cannot afford this vehicle!");
             }
         }
-        else if(eventName == "explode")
+        else if(eventName == "explode") //Tyre explosion
         {
             //API.popVehicleTyre(API.getPlayerVehicle(player), 1, true);
             //API.sendNativeToPlayer(player, GTANetworkServer.Hash.STEER_UNLOCK_BIAS, API.getPlayerVehicle(player), true);
@@ -1001,10 +1027,11 @@ public class server_core_remaster_2 : Script
         }
     }
 
+    //Commands
     [Command("cef")]
     public void cefTestFunc(Client player)
     {
-        API.triggerClientEvent(player, "cef_test");
+        API.triggerClientEvent(player, "cef_test"); //test
     }
 
     [Command("myid")]
@@ -1058,7 +1085,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("me", GreedyArg = true)]
+    [Command("me", "Usage: /me [action].", GreedyArg = true)]
     public void meCommand(Client player, string msg)
     {
         int indx = getPlayerDatabaseIndexByClient(player);
@@ -1218,13 +1245,13 @@ public class server_core_remaster_2 : Script
         API.triggerClientEvent(player, "delete_all_labels");
     }
 
-    [Command("spawncar", GreedyArg = true)]
+    [Command("spawncar", "Usage: /spawncar [name].", GreedyArg = true)]
     public void spawnCarFunc(Client player, string carname)
     {
         spawnCar(player, carname, false, new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0), 0, 0, true, 0);
     }
 
-    public void spawnExistingCar(ref VehicleData veh)
+    public void spawnExistingCar(ref VehicleData veh) //Used for database initialisation
     {
         veh.vehicle_object = API.createVehicle(API.vehicleNameToModel(veh.car_model_name), veh.vehicle_position, veh.vehicle_rotation, veh.vehicle_primary_color, veh.vehicle_secondary_color);
         veh.vehicle_id = getRandomIDVehiclePool();
@@ -1264,11 +1291,18 @@ public class server_core_remaster_2 : Script
         {
             int indx = getPlayerDatabaseIndexByClient(player);
             API.sendChatMessageToPlayer(player, "Spawned car!");
-            Vehicle hash;
+            Vehicle hash = null;
             if (forcePos)
                 hash = API.createVehicle(API.vehicleNameToModel(carname), pos, rot, 0, 0, dim);
             else
                 hash = API.createVehicle(API.vehicleNameToModel(carname), API.getEntityPosition(player), API.getEntityRotation(player), 0, 0, dim);
+            
+            if(hash == null)
+            {
+                API.sendChatMessageToPlayer(player, "Car model name is incorrect.");
+                return;
+            }
+            
             //API.setVehicleNumberPlate(hash, "TJM");
             VehicleData temp = new VehicleData(hash, getRandomIDVehiclePool(), carname, API.getEntityPosition(hash), API.getEntityRotation(hash), "tjm000", player_database[indx].player_display_name, "civillian");
             const string strng = "ABCDEFGHJKLMNOPQRSTUVWXYZ0123456789";
@@ -1325,7 +1359,7 @@ public class server_core_remaster_2 : Script
         API.sendChatMessageToPlayer(player, "Full Name: ~b~" + player_database[indx].player_display_name + "   |   ~w~Faction: ~b~" + player_database[indx].player_faction);
         //API.sendChatMessageToPlayer(player, "Phone #: ~b~" + player_database[indx].phone_number);
         API.sendChatMessageToPlayer(player, "Money (Bank): ~b~$" + player_database[indx].player_money_bank.ToString("N0") + "  |  ~w~Money (Hand): ~b~$" + player_database[indx].player_money_hand.ToString("N0"));
-
+        API.sendChatMessageToPlayer(player, "Paycheck: ~b~$" + player_database[indx].player_paycheck.ToString("N0"));
         API.sendChatMessageToPlayer(player, "Vehicle(s) Owned: ~b~" + player_database[indx].player_vehicles_owned);
         API.sendChatMessageToPlayer(player, "~b~|-------------------|");
     }
@@ -1380,7 +1414,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("close", "Usage: /close ~b~(car part)", GreedyArg = true)]
+    [Command("close", "Usage: /close [car part].", GreedyArg = true)] //Close car parts
     public void doorCloseFunc(Client player, string action)
     {
         List<NetHandle> vehs = new List<NetHandle>();
@@ -1450,7 +1484,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("open", "Usage: /open ~b~(car part)", GreedyArg = true)]
+    [Command("open", "Usage: /open [car part].", GreedyArg = true)] //Open car parts
     public void doorOpenFunc(Client player, string action)
     {
         List<NetHandle> vehs = new List<NetHandle>();
@@ -1670,7 +1704,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("anim", "Usage: /anim ~b~(name)", GreedyArg = true)]
+    [Command("anim", "Usage: /anim [name/help/stop].", GreedyArg = true)]
     public void animFunc(Client player, string action, bool loop = true)
     {
         int indx = getPlayerDatabaseIndexByClient(player);
@@ -1811,7 +1845,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("runplate", "Usage: /runplate ~b~(plate #)", GreedyArg = true)]
+    [Command("runplate", "Usage: /runplate [plate #].", GreedyArg = true)]
     public void carinfoFunc(Client player, string license)
     {
         //API.triggerClientEvent(player, "vehicle_draw_text", temp.vehicle_hash, temp.vehicle_id, temp.owner_name, temp.license_plate);
@@ -1863,7 +1897,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("check", "Usage: /check ~b~(car part)", GreedyArg = true)]
+    [Command("check", "Usage: /check [car part].", GreedyArg = true)]
     public void checkFunc(Client player, string action)
     {
         action = action.ToLower();
@@ -1930,7 +1964,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("put", "Usage: /put ~b~(object name) (car part)", GreedyArg = true)]
+    [Command("put", "Usage: /put [object name] [car part].", GreedyArg = true)]
     public void putFunc(Client player, string action)
     {
         int indx = getPlayerDatabaseIndexByClient(player);
@@ -2021,7 +2055,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("take", "Usage: /take ~b~(object name) (car part)", GreedyArg = true)]
+    [Command("take", "Usage: /take [object name] [car part].", GreedyArg = true)]
     public void takeFunc(Client player, string action)
     {
         int indx = getPlayerDatabaseIndexByClient(player);
@@ -2121,7 +2155,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("addmoney", "Usage: /addmoney [amount] [firstname_lastname]", GreedyArg = true)]
+    [Command("addmoney", "Usage: /addmoney [amount] [firstname_lastname].", GreedyArg = true)]
     public void addMoneyFunc(Client player, string name_amount)
     {
         char[] delimiter = { ' ' };
@@ -2152,7 +2186,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("teleport", GreedyArg = true)]
+    [Command("teleport", "Usage: /teleport [X] [Y] [Z].", GreedyArg = true)]
     public void teleportFunc(Client player, string coords)
     {
         char[] delimiter = { ' ' };
@@ -2164,14 +2198,22 @@ public class server_core_remaster_2 : Script
         double z;
 
         x = Convert.ToDouble(words[0]);
-        y = Convert.ToDouble(words[1]);
-        z = Convert.ToDouble(words[2]);
+        if(words.Length == 3)
+        {
+            y = Convert.ToDouble(words[1]);
+            z = Convert.ToDouble(words[2]);
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "Coordinates are incorrectly formatted.");
+            return;
+        }
 
         Vector3 telepos = new Vector3(x, y, z);
         API.setEntityPosition(player, telepos);
     }
 
-    [Command("additem", "Usage: /additem [id] [name]", GreedyArg = true)]
+    [Command("addobject", "Usage: /addobject [id] [name].", GreedyArg = true)]
     public void addItemFunc(Client player, string id)
     {
         int indx = getPlayerDatabaseIndexByClient(player);
@@ -2201,7 +2243,7 @@ public class server_core_remaster_2 : Script
         API.sendChatMessageToPlayer(player, "Object added to inventory: " + temp.id);
     }
 
-    [Command("removeitem", "Usage: /removeitem [name]", GreedyArg = true)]
+    [Command("removeobject", "Usage: /removeobject [name].", GreedyArg = true)]
     public void removeItemFunc(Client player, string item)
     {
         item = item.ToLower();
@@ -2218,7 +2260,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("place", "Usage: /place ~b~(object name)", GreedyArg = true)]
+    [Command("place", "Usage: /place [object name].", GreedyArg = true)]
     public void spawnItemFunc(Client player, string item)
     {
         item = item.ToLower();
@@ -2369,7 +2411,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("setcolor", GreedyArg = true)]
+    [Command("setcolor", "Usage: /setcolor [name].", GreedyArg = true)]
     public void setColorFunc(Client player, string colorname)
     {
         if (API.isPlayerInAnyVehicle(player))
@@ -2402,7 +2444,7 @@ public class server_core_remaster_2 : Script
         API.sendChatMessageToPlayer(player, "Current Time: ~b~ " + DateTime.Now.ToString());
     }
 
-    [Command("setpaycheck", GreedyArg = true)]
+    [Command("setpaycheck", "Usage: /setpaycheck [amount].", GreedyArg = true)]
     public void setPayCheckFunc(Client player, string arg)
     {
         long paycheck = Convert.ToInt64(arg);
