@@ -730,20 +730,36 @@ public class server_core_remaster_2 : Script
         {
             if (API.getEntitySyncedData(vehs[i], "indicator_right") != null)
                 API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 0, API.getEntitySyncedData(vehs[i], "indicator_right"));
+            else
+                API.setEntitySyncedData(vehs[i], "indicator_right", false);
             if (API.getEntitySyncedData(vehs[i], "indicator_left") != null)
                 API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_VEHICLE_INDICATOR_LIGHTS, vehs[i], 1, API.getEntitySyncedData(vehs[i], "indicator_left"));
+            else
+                API.setEntitySyncedData(vehs[i], "indicator_left", false);
             if (API.getEntitySyncedData(vehs[i], "trunk") != null)
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 5, vehs[i], API.getEntitySyncedData(vehs[i], "trunk"));
+            else
+                API.setEntitySyncedData(vehs[i], "trunk", false);
             if (API.getEntitySyncedData(vehs[i], "hood") != null)
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 4, vehs[i], API.getEntitySyncedData(vehs[i], "hood"));
+            else
+                API.setEntitySyncedData(vehs[i], "hood", false);
             if (API.getEntitySyncedData(vehs[i], "door1") != null)
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 0, vehs[i], API.getEntitySyncedData(vehs[i], "door1"));
+            else
+                API.setEntitySyncedData(vehs[i], "door1", false);
             if (API.getEntitySyncedData(vehs[i], "door2") != null)
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 1, vehs[i], API.getEntitySyncedData(vehs[i], "door2"));
+            else
+                API.setEntitySyncedData(vehs[i], "door2", false);
             if (API.getEntitySyncedData(vehs[i], "door3") != null)
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 2, vehs[i], API.getEntitySyncedData(vehs[i], "door3"));
+            else
+                API.setEntitySyncedData(vehs[i], "door3", false);
             if (API.getEntitySyncedData(vehs[i], "door4") != null)
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
+            else
+                API.setEntitySyncedData(vehs[i], "door4", false);
         }
 
     }
@@ -800,6 +816,11 @@ public class server_core_remaster_2 : Script
                         API.setEntitySyncedData(entity, "tyre_0_popped", true);
                     }
                 }
+                else
+                {
+                    API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 0, true, 1000.0);
+                    API.setEntitySyncedData(entity, "tyre_0_popped", true);
+                }
             }
             if (randomBool())
             {
@@ -810,6 +831,11 @@ public class server_core_remaster_2 : Script
                         API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 1, true, 1000.0);
                         API.setEntitySyncedData(entity, "tyre_1_popped", true);
                     }
+                }
+                else
+                {
+                    API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 0, true, 1000.0);
+                    API.setEntitySyncedData(entity, "tyre_1_popped", true);
                 }
             }
             if (randomBool())
@@ -822,6 +848,11 @@ public class server_core_remaster_2 : Script
                         API.setEntitySyncedData(entity, "tyre_2_popped", true);
                     }
                 }
+                else
+                {
+                    API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 0, true, 1000.0);
+                    API.setEntitySyncedData(entity, "tyre_2_popped", true);
+                }
             }
             if (randomBool())
             {
@@ -832,6 +863,11 @@ public class server_core_remaster_2 : Script
                         API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 3, true, 1000.0);
                         API.setEntitySyncedData(entity, "tyre_3_popped", true);
                     }
+                }
+                else
+                {
+                    API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 0, true, 1000.0);
+                    API.setEntitySyncedData(entity, "tyre_3_popped", true);
                 }
             }
             if (randomBool())
@@ -844,6 +880,11 @@ public class server_core_remaster_2 : Script
                         API.setEntitySyncedData(entity, "tyre_4_popped", true);
                     }
                 }
+                else
+                {
+                    API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 0, true, 1000.0);
+                    API.setEntitySyncedData(entity, "tyre_4_popped", true);
+                }
             }
             if (randomBool())
             {
@@ -854,6 +895,11 @@ public class server_core_remaster_2 : Script
                         API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 5, true, 1000.0);
                         API.setEntitySyncedData(entity, "tyre_5_popped", true);
                     }
+                }
+                else
+                {
+                    API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_VEHICLE_TYRE_BURST, entity, 0, true, 1000.0);
+                    API.setEntitySyncedData(entity, "tyre_5_popped", true);
                 }
             }
         }
@@ -1339,6 +1385,12 @@ public class server_core_remaster_2 : Script
             API.setEntitySyncedData(temp.vehicle_object, "door3", false);
             API.setEntitySyncedData(temp.vehicle_object, "door4", false);
             API.setEntitySyncedData(temp.vehicle_object, "attached", false);
+            API.setEntitySyncedData(temp.vehicle_object, "tyre_0_popped", false);
+            API.setEntitySyncedData(temp.vehicle_object, "tyre_1_popped", false);
+            API.setEntitySyncedData(temp.vehicle_object, "tyre_2_popped", false);
+            API.setEntitySyncedData(temp.vehicle_object, "tyre_3_popped", false);
+            API.setEntitySyncedData(temp.vehicle_object, "tyre_4_popped", false);
+            API.setEntitySyncedData(temp.vehicle_object, "tyre_5_popped", false);
             API.setVehicleNumberPlate(temp.vehicle_object, (string)temp.vehicle_license);
             API.setVehicleEngineStatus(temp.vehicle_object, false);
             API.setVehicleLocked(temp.vehicle_object, true);
