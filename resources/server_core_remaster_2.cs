@@ -1811,7 +1811,7 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("runplate", "Usage: /license ~b~(plate #)", GreedyArg = true)]
+    [Command("runplate", "Usage: /runplate ~b~(plate #)", GreedyArg = true)]
     public void carinfoFunc(Client player, string license)
     {
         //API.triggerClientEvent(player, "vehicle_draw_text", temp.vehicle_hash, temp.vehicle_id, temp.owner_name, temp.license_plate);
