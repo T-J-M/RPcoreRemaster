@@ -55,7 +55,7 @@ public class server_core_remaster_2 : Script
         API.setBlipSprite(newblip, 380);
         API.setBlipColor(newblip, 47);
         API.setBlipScale(newblip, 1.0f);
-
+        API.setBlipShortRange(newblip, true);
         blip_database.Add(newblip);
 
         timer = new System.Timers.Timer(10000);
@@ -589,6 +589,19 @@ public class server_core_remaster_2 : Script
         return online;
     }
 
+    public string getColorName(int id)
+    {
+        for(int i = 0; i < color_names.Length; i++)
+        {
+            for(int j = 0; j < color_names[i].colors.Length; j++)
+            {
+                if (color_names[i].colors[j] == id)
+                    return color_names[i].color_name;
+            }
+        }
+        return "null";
+    }
+
     public string getVehicleName(NetHandle veh)
     {
         if(!veh.IsNull)
@@ -1103,7 +1116,6 @@ public class server_core_remaster_2 : Script
         int indx = getPlayerDatabaseIndexByClient(player);
         if (password == player_database[indx].player_password)
         {
-            API.sendChatMessageToPlayer(player, "Welcome, ~b~" + player_database[indx].player_display_name + "~w~! TEST(" + API.getPlayerNametag(player) + ")");
             //Change player data and log him in
             PlayerData plr_temp = player_database[indx];
             plr_temp.player_logged = true;
@@ -1116,7 +1128,7 @@ public class server_core_remaster_2 : Script
             player_database[indx] = plr_temp;
 
             API.setPlayerNametag(player, plr_temp.player_display_name);
-
+            API.sendChatMessageToPlayer(player, "Welcome, ~b~" + player_database[indx].player_display_name + "~w~! TEST(" + API.getPlayerNametag(player) + ")");
             for (int i = 0; i < store_locations.Length; i++)
             {
                 API.sendChatMessageToPlayer(player, "store_location_added");
@@ -1332,6 +1344,9 @@ public class server_core_remaster_2 : Script
             API.setVehicleLocked(temp.vehicle_object, true);
             API.setVehiclePrimaryColor(temp.vehicle_object, color1);
             API.setVehicleSecondaryColor(temp.vehicle_object, color2);
+            temp.vehicle_primary_color = color1;
+            temp.vehicle_secondary_color = color2;
+            temp.vehicle_color = getColorName(color1);
             vehicle_database.Add(temp);
             PlayerData plr = player_database[indx];
             plr.player_vehicles_owned++;
@@ -1761,66 +1776,76 @@ public class server_core_remaster_2 : Script
         if(getVehicleName(player_veh) == "flatbed")
         {
             int indx = getPlayerDatabaseIndexByClient(player);
-            List<NetHandle> vehs = new List<NetHandle>();
-            vehs = API.getAllVehicles();
-            float smallestDist = 100.0f;
-            NetHandle closestveh = new NetHandle();
-            bool found = false;
-            for (int i = 0; i < vehs.Count; i++)
+            if(indx != -1)
             {
-                if (vehs[i] != player_veh && vehicle_database[getVehicleIndexByVehicle(closestveh)].vehicle_owner == player_database[indx].player_display_name)
+                List<NetHandle> vehs = new List<NetHandle>();
+                vehs = API.getAllVehicles();
+                float smallestDist = 100.0f;
+                NetHandle closestveh = new NetHandle();
+                bool found = false;
+                for (int i = 0; i < vehs.Count; i++)
                 {
-                    float vr = vecdist(API.getEntityPosition(vehs[i]), API.getEntityPosition(player_veh)); //Get distance between car and player
-                    if (vr < smallestDist)
+                    if (vehs[i] != player_veh)
                     {
-                        smallestDist = vr;
-                        closestveh = vehs[i];
-                        found = true;
+                        int veh_indx = getVehicleIndexByVehicle(vehs[i]);
+                        if(veh_indx != -1)
+                        {
+                            if (vehicle_database[veh_indx].vehicle_owner.ToLower() == player_database[indx].player_display_name.ToLower())
+                            {
+                                float vr = vecdist(API.getEntityPosition(vehs[i]), API.getEntityPosition(player_veh)); //Get distance between car and player
+                                if (vr < smallestDist)
+                                {
+                                    smallestDist = vr;
+                                    closestveh = vehs[i];
+                                    found = true;
+                                }
+                            }
+                        }
                     }
                 }
-            }
 
-            if (found) //Found SOME car
-            {
-                if (smallestDist < 10.0f) //Close enough?
+                if (found) //Found SOME car
                 {
-                    /*NetHandle obj = API.createObject(-1036807324, API.getEntityPosition(player), API.getEntityRotation(player));
-                    API.attachEntityToEntity(obj, closestveh, "wheel_lf", new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0));
-                    Vector3 pos = API.getEntityPosition(obj);
-                    API.sendChatMessageToPlayer(player, "X: " + pos.X + " Y: " + pos.Y + " Z: " + pos.Z);
+                    if (smallestDist < 10.0f) //Close enough?
+                    {
+                        /*NetHandle obj = API.createObject(-1036807324, API.getEntityPosition(player), API.getEntityRotation(player));
+                        API.attachEntityToEntity(obj, closestveh, "wheel_lf", new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0));
+                        Vector3 pos = API.getEntityPosition(obj);
+                        API.sendChatMessageToPlayer(player, "X: " + pos.X + " Y: " + pos.Y + " Z: " + pos.Z);
 
-                    NetHandle obj2 = API.createObject(-1036807324, API.getEntityPosition(player), API.getEntityRotation(player));
-                    API.attachEntityToEntity(obj2, closestveh, "roof", new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0));
-                    Vector3 pos2 = API.getEntityPosition(obj2);
-                    API.sendChatMessageToPlayer(player, "X: " + pos2.X + " Y: " + pos2.Y + " Z: " + pos2.Z);*/
+                        NetHandle obj2 = API.createObject(-1036807324, API.getEntityPosition(player), API.getEntityRotation(player));
+                        API.attachEntityToEntity(obj2, closestveh, "roof", new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0));
+                        Vector3 pos2 = API.getEntityPosition(obj2);
+                        API.sendChatMessageToPlayer(player, "X: " + pos2.X + " Y: " + pos2.Y + " Z: " + pos2.Z);*/
 
-                    float whatever = API.fetchNativeFromPlayer<float>(player, GTANetworkServer.Hash.GET_ENTITY_HEIGHT_ABOVE_GROUND, closestveh);
-                    API.sendChatMessageToPlayer(player, "height: " + whatever);
-                    API.attachEntityToEntity(closestveh, player_veh, "bodyshell", new Vector3(0.0, -2.0, Convert.ToDouble(whatever) + 0.425), new Vector3(0.0, 0.0, 0.0));
-                    API.sendChatMessageToPlayer(player, "Car has been attached.");
-                    API.setEntitySyncedData(closestveh, "attached", true);
-                    API.setEntitySyncedData(player_veh, "attachee", closestveh);
+                        float whatever = API.fetchNativeFromPlayer<float>(player, GTANetworkServer.Hash.GET_ENTITY_HEIGHT_ABOVE_GROUND, closestveh);
+                        API.sendChatMessageToPlayer(player, "height: " + whatever);
+                        API.attachEntityToEntity(closestveh, player_veh, "bodyshell", new Vector3(0.0, -2.0, Convert.ToDouble(whatever) + 0.425), new Vector3(0.0, 0.0, 0.0));
+                        API.sendChatMessageToPlayer(player, "Car has been attached.");
+                        API.setEntitySyncedData(closestveh, "attached", true);
+                        API.setEntitySyncedData(player_veh, "attachee", closestveh);
 
-                    API.sendChatMessageToPlayer(player, getVehicleName(player_veh));
+                        API.sendChatMessageToPlayer(player, getVehicleName(player_veh));
 
-                    //API.triggerClientEvent(player, "trythis", closestveh, player_veh);
-                    /*double height = Math.Abs(bone1position - bone2position);
-                    API.sendChatMessageToPlayer(player, "b1z: " + bone1position);
-                    API.sendChatMessageToPlayer(player, "b2z:" + bone2position);
-                    API.sendChatMessageToPlayer(player, "height: " + height);
-                    API.attachEntityToEntity(vehicle_database[closestveh].vehicle_object, vehicle_database[player_veh].vehicle_object, "bodyshell", new Vector3(0.0, -2.0, height), new Vector3(0.0, 0.0, 0.0));
-                    API.setEntitySyncedData(vehicle_database[player_veh].vehicle_object, "attached", closestveh);
-                    API.setEntityCollisionless(vehicle_database[closestveh].vehicle_object, false);*/
+                        //API.triggerClientEvent(player, "trythis", closestveh, player_veh);
+                        /*double height = Math.Abs(bone1position - bone2position);
+                        API.sendChatMessageToPlayer(player, "b1z: " + bone1position);
+                        API.sendChatMessageToPlayer(player, "b2z:" + bone2position);
+                        API.sendChatMessageToPlayer(player, "height: " + height);
+                        API.attachEntityToEntity(vehicle_database[closestveh].vehicle_object, vehicle_database[player_veh].vehicle_object, "bodyshell", new Vector3(0.0, -2.0, height), new Vector3(0.0, 0.0, 0.0));
+                        API.setEntitySyncedData(vehicle_database[player_veh].vehicle_object, "attached", closestveh);
+                        API.setEntityCollisionless(vehicle_database[closestveh].vehicle_object, false);*/
 
+                    }
+                    else
+                    {
+                        API.sendChatMessageToPlayer(player, "No suitable car found nearby.");
+                    }
                 }
                 else
                 {
                     API.sendChatMessageToPlayer(player, "No suitable car found nearby.");
                 }
-            }
-            else
-            {
-                API.sendChatMessageToPlayer(player, "No suitable car found nearby.");
             }
         }
         else
