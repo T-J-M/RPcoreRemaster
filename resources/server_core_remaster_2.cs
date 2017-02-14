@@ -16,19 +16,42 @@ using System.IO;
 
 public class server_core_remaster_2 : Script
 {
+    //Database objects
     public MongoClient client = new MongoClient();
-    public IMongoDatabase db;
-    public IMongoCollection<BsonDocument> collection;
-    static System.Timers.Timer timer;
-    public bool timer_debouce = true;
+    public IMongoDatabase db_players;
+    public IMongoDatabase db_vehicles;
+    public IMongoCollection<BsonDocument> collection_players;
+    public IMongoCollection<BsonDocument> collection_vehicles;
+
+
+    public List<ObjectData> object_database = new List<ObjectData>(); //User placed objects (static/nonstatic)
+    public List<PlayerData> player_database = new List<PlayerData>();  //Player data
+    public List<VehicleData> vehicle_database = new List<VehicleData>(); //Vehicle data
+    public List<Blip> blip_database = new List<Blip>(); //Map blip data
+    public List<int> RandomIDPlayerPool = new List<int>(); //Player ID recycle pool
+    public List<int> RandomIDVehiclePool = new List<int>(); //Vehicle ID recycle pool
+    public List<int> RandomIDObjectPool = new List<int>(); //Object ID recycle pool
+
+    //Trackers
+    static System.Timers.Timer timer; //Used for paychecks
+    public bool timer_debouce = true; //Used for paychecks
+    public int dealership_1_spawn_counter = 0; //Spawn locations for after-purchase of car
+    public int dealership_dim = 0; //Dealership showroom dimension tracker
+
+    //Used for rng
+    public static Random rnd = new Random();
+
     public server_core_remaster_2()
     {
+        //Handlers
         API.onResourceStart += OnResourceStartHandler;
+        API.onResourceStop += OnResourceStopHandler;
         API.onPlayerConnected += OnPlayerConnectedHandler;
         API.onClientEventTrigger += OnClientEventTriggerHandler;
         API.onChatMessage += OnChatMessageHandler;
         API.onChatCommand += OnChatCommandHandler;
         API.onPlayerDisconnected += OnPlayerDisconnectedHandler;
+        API.onPlayerEnterVehicle += OnPlayerEnterVehicleHandler;
         Blip newblip = API.createBlip(new Vector3(-61.70732, -1093.239, 26.4819));
         API.setBlipSprite(newblip, 380);
         API.setBlipColor(newblip, 47);
@@ -40,55 +63,6 @@ public class server_core_remaster_2 : Script
         timer.Elapsed += timer_Elapsed;
         timer.AutoReset = true;
         timer.Enabled = true;
-
-        
-    }
-
-    public void applyPaychecks()
-    {
-        if(timer_debouce)
-        {
-            timer_debouce = false;
-            for (int i = 0; i < player_database.Count; i++)
-            {
-                PlayerData temp = player_database[i];
-                if (temp.player_logged == true && temp.player_online == true)
-                {
-                    temp.player_money_bank += temp.player_paycheck;
-                    player_database[i] = temp;
-                    API.sendChatMessageToPlayer(temp.player_client, "Your paycheck of ~b~$" + temp.player_paycheck.ToString("N0") + " ~w~has come in!");
-                }
-            }
-        }
-    }
-
-    [Command("time")]
-    public void timeFunc(Client player)
-    {
-        API.sendChatMessageToPlayer(player, "Current Time: ~b~ " + DateTime.Now.ToString());
-    }
-
-    [Command("setpaycheck", GreedyArg = true)]
-    public void setPayCheckFunc(Client player, string arg)
-    {
-        long paycheck = Convert.ToInt64(arg);
-        int indx = getPlayerDatabaseIndexByClient(player);
-        PlayerData temp = player_database[indx];
-        temp.player_paycheck = paycheck;
-        player_database[indx] = temp;
-        API.sendChatMessageToPlayer(player, "Paycheck applied.");
-    }
-
-    void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-    {
-        if(DateTime.Now.Minute == 00)
-        {
-            applyPaychecks();
-        }
-        else if(DateTime.Now.Minute != 00 && timer_debouce == false)
-        {
-            timer_debouce = true;
-        }
     }
 
     [Flags]
@@ -109,6 +83,7 @@ public class server_core_remaster_2 : Script
         new Vector3(1655.813, 0.889, 200.0),
         new Vector3(1070.206, -711.958, 70.483),
     };
+
 
     public struct DoubleVector3
     {
@@ -152,8 +127,6 @@ public class server_core_remaster_2 : Script
         new DoubleVector3(new Vector3(-43.70016, -1109.625, 26.02453), new Vector3(-0.1142287, -0.05879881, 71.22818)),
         new DoubleVector3(new Vector3(-52.19479, -1106.735, 26.02584), new Vector3(-0.1178563, -0.06428397, 71.15902)),
     };
-
-    public static Random rnd = new Random();
 
     public struct ColorData
     {
@@ -224,24 +197,26 @@ public class server_core_remaster_2 : Script
     {
         public ObjectId Id { get; set; }
         [BsonIgnore]
-        public Vehicle vehicle_object;
-        public int vehicle_id;
-        public string car_model_name;
+        public Vehicle vehicle_object { get; set; }
+        public int vehicle_id { get; set; }
+        public string car_model_name { get; set; }
 
-        public bool vehicle_engine;
-        public bool vehicle_locked;
-        public int vehicle_primary_color;
-        public int vehicle_secondary_color;
-        public string vehicle_color;
+        public bool vehicle_engine { get; set; }
+        public bool vehicle_locked { get; set; }
+        public int vehicle_primary_color { get; set; }
+        public int vehicle_secondary_color { get; set; }
+        public string vehicle_color { get; set; }
 
-        public Vector3 vehicle_position;
-        public Vector3 vehicle_rotation;
+        public Vector3 vehicle_position { get; set; }
+        public Vector3 vehicle_rotation { get; set; }
 
-        public string vehicle_license;
-        public string vehicle_owner;
-        public string vehicle_faction;
+        public string vehicle_license { get; set; }
+        public string vehicle_owner { get; set; }
+        public string vehicle_faction { get; set; }
 
-        public List<ObjectData> vehicle_inventory;
+        public string driver { get; set; }
+
+        public List<ObjectData> vehicle_inventory { get; set; }
 
         public VehicleData(Vehicle hash, int id, string model_name, Vector3 pos, Vector3 rot, string license, string owner, string faction)
         {
@@ -262,7 +237,7 @@ public class server_core_remaster_2 : Script
             this.vehicle_primary_color = 0;
             this.vehicle_secondary_color = 0;
             this.vehicle_color = "Black";
-
+            this.driver = "";
             this.vehicle_inventory = new List<ObjectData>();
         }
     }
@@ -369,15 +344,7 @@ public class server_core_remaster_2 : Script
         new AnimData("drums", 591916419, "PH_L_Hand", new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0), (int)(AnimationFlags.Loop | AnimationFlags.OnlyAnimateUpperBody | AnimationFlags.AllowPlayerControl), "amb@world_human_musician@bongos@male@idle_a", "idle_a"),
     };
 
-    public List<ObjectData> object_database = new List<ObjectData>();
 
-    public List<PlayerData> player_database = new List<PlayerData>();
-    public List<VehicleData> vehicle_database = new List<VehicleData>();
-    public List<Blip> blip_database = new List<Blip>();
-
-    public List<int> RandomIDPlayerPool = new List<int>();
-    public List<int> RandomIDVehiclePool = new List<int>();
-    public List<int> RandomIDObjectPool = new List<int>();
 
     public int getPlayerDatabaseIndexByClient(Client player)
     {
@@ -443,7 +410,7 @@ public class server_core_remaster_2 : Script
 
     public void OnResourceStartHandler()
     {
-        API.consoleOutput("server_core initialising...");
+        API.consoleOutput("Server_Core is initialising...");
         for (int i = 0; i < 1000; i++)
         {
             int temp = rnd.Next(1, 100000);
@@ -461,38 +428,119 @@ public class server_core_remaster_2 : Script
                 temp = rnd.Next(1, 100000);
             RandomIDObjectPool.Add(temp);
         }
-        API.consoleOutput("server_core initialised.");
 
         WebClient webClient = new WebClient();
         string IP = webClient.DownloadString("http://api.ipify.org/");
-        API.consoleOutput("IP: " + IP);
+        API.consoleOutput("Public IP: " + IP);
 
-        //PlayerData plr = new PlayerData(null, -1, (PedHash)123, "bigballer", "Test_Mcbutt", "123");
-        db = client.GetDatabase("PlayerDatabase");
-        collection = db.GetCollection<BsonDocument>("PlayerData");
-        //var bsonObj = plr.ToBsonDocument();
-        //collection.InsertOne(bsonObj);
-
-        var filter = new BsonDocument();
-
-        using (var cursor = collection.FindSync<BsonDocument>(filter))
+        if (client.Cluster.Description.State.ToString() == "Disconnected")
         {
-            while(cursor.MoveNext())
+            API.consoleOutput("MongoDB database is offline!");
+        }
+        else
+        {
+            API.consoleOutput("Fetching database...");
+            db_players = client.GetDatabase("PlayerDatabase");
+            collection_players = db_players.GetCollection<BsonDocument>("PlayerData");
+            db_vehicles = client.GetDatabase("VehicleDatabase");
+            collection_vehicles = db_vehicles.GetCollection<BsonDocument>("VehicleData");
+
+
+            var filter = new BsonDocument();
+            API.consoleOutput("Fetching player data...");
+            using (var cursor = collection_players.FindSync<BsonDocument>(filter))
             {
-                var batch = cursor.Current;
-                foreach(var document in batch)
+                while (cursor.MoveNext())
                 {
-                    var obj = BsonSerializer.Deserialize<PlayerData>(document);
-                    //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
-                    API.consoleOutput("Found user: " + obj.player_game_name + " -> " + obj.Id.ToString());
-                    player_database.Add(obj);
+                    var batch = cursor.Current;
+                    foreach (var document in batch)
+                    {
+                        var obj = BsonSerializer.Deserialize<PlayerData>(document);
+                        //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
+                        API.consoleOutput("Found user: " + obj.player_game_name + " -> " + obj.Id.ToString());
+                        player_database.Add(obj);
+                    }
                 }
             }
+            API.consoleOutput("Complete.");
+            API.consoleOutput("Fetching vehicle data...");
+            using (var cursor = collection_vehicles.FindSync<BsonDocument>(filter))
+            {
+                while (cursor.MoveNext())
+                {
+                    var batch = cursor.Current;
+                    foreach (var document in batch)
+                    {
+                        var obj = BsonSerializer.Deserialize<VehicleData>(document);
+                        //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
+                        API.consoleOutput("Found vehicle: " + obj.car_model_name + " -> " + obj.Id.ToString());
+                        spawnExistingCar(ref obj);
+                        vehicle_database.Add(obj);
+                    }
+                }
+            }
+            API.consoleOutput("Complete.");
+            API.consoleOutput("Database has been accumulated.");
         }
 
-        API.requestIpl("shr_int");
-        API.removeIpl("fakeint");
+        API.requestIpl("shr_int"); //Load Deluxe Motorsport interior
+        API.removeIpl("fakeint"); //Remove the fake Deluxe Motorsport interior
 
+        API.consoleOutput("Server_Core has initialised.");
+    }
+
+    public void OnResourceStopHandler()
+    {
+        API.consoleOutput("Server_Core is terminating...");
+        if (client.Cluster.Description.State.ToString() == "Disconnected")
+        {
+            API.consoleOutput("MongoDB database is offline!");
+        }
+        else
+        {
+            API.consoleOutput("Pushing database...");
+
+            API.consoleOutput("Pushing player data...");
+            for (int i = 0; i < player_database.Count; i++)
+            {
+                PlayerData player_data = player_database[i];
+                player_data.player_online = false;
+                player_data.player_logged = false;
+                player_data.player_id = -1;
+                if(player_data.player_client != null)
+                {
+                    player_data.player_position = API.getEntityPosition(player_data.player_client);
+                    player_data.player_rotation = API.getEntityRotation(player_data.player_client);
+                }
+                API.consoleOutput("_id -> " + player_data.Id.ToString() + " has been pushed into the database.");
+                var bsonObj = player_data.ToBsonDocument();
+                var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], player_data.Id);
+                var result = collection_players.ReplaceOne(filter, bsonObj, new UpdateOptions { IsUpsert = true });
+            }
+            API.consoleOutput("Done.");
+
+            API.consoleOutput("Pushing vehicle data...");
+            for (int i = 0; i < vehicle_database.Count; i++)
+            {
+                VehicleData vehicle_data = vehicle_database[i];
+                vehicle_data.vehicle_id = -1;
+                vehicle_data.vehicle_locked = true;
+                vehicle_data.vehicle_engine = false;
+                if(vehicle_data.vehicle_object != null)
+                {
+                    vehicle_data.vehicle_position = API.getEntityPosition(vehicle_data.vehicle_object);
+                    vehicle_data.vehicle_rotation = API.getEntityRotation(vehicle_data.vehicle_object);
+                }
+                API.consoleOutput("_id -> " + vehicle_data.Id.ToString() + " has been pushed into the database.");
+                var bsonObj = vehicle_data.ToBsonDocument();
+                var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], vehicle_data.Id);
+                var result = collection_vehicles.ReplaceOne(filter, bsonObj, new UpdateOptions { IsUpsert = true });
+            }
+            API.consoleOutput("Done.");
+        }
+
+        API.consoleOutput("Server_Core has terminated.");
+        API.sleep(2000);
     }
 
     public int getPlayerCount()
@@ -601,9 +649,17 @@ public class server_core_remaster_2 : Script
             API.sendChatMessageToPlayer(player, "Please ~b~register ~w~using /register [firstname_lastname] [password]");
         }
 
-        var bsonObj = player_data.ToBsonDocument();
-        var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], player_data.Id);
-        var result = collection.ReplaceOne(filter, bsonObj, new UpdateOptions { IsUpsert = true });
+        if (client.Cluster.Description.State.ToString() == "Disconnected")
+        {
+            API.consoleOutput("MongoDB database is offline!");
+        }
+        else
+        {
+            API.consoleOutput("_id -> " + player_data.Id.ToString() + " has been pushed into the database.");
+            var bsonObj = player_data.ToBsonDocument();
+            var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], player_data.Id);
+            var result = collection_players.ReplaceOne(filter, bsonObj, new UpdateOptions { IsUpsert = true });
+        }
 
         int rnd_location = rnd.Next(0, loginscreen_locations.Length);
         API.setPlayerSkin(player, API.pedNameToModel("Mani"));
@@ -638,25 +694,36 @@ public class server_core_remaster_2 : Script
                 API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
         }
 
-       
+    }
 
-        /*var filter = new BsonDocument();
-
-        using (var cursor = collection.FindSync<BsonDocument>(filter))
+    public void applyPaychecks()
+    {
+        if (timer_debouce)
         {
-            while (cursor.MoveNext())
+            timer_debouce = false;
+            for (int i = 0; i < player_database.Count; i++)
             {
-                var batch = cursor.Current;
-                foreach (var document in batch)
+                PlayerData temp = player_database[i];
+                if (temp.player_logged == true && temp.player_online == true)
                 {
-                    var obj = BsonSerializer.Deserialize<PlayerData>(document);
-                    //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
-                    API.consoleOutput("Found user: " + obj.player_game_name + " -> " + obj.Id.ToString());
-                    player_database.Add(obj);
+                    temp.player_money_bank += temp.player_paycheck;
+                    player_database[i] = temp;
+                    API.sendChatMessageToPlayer(temp.player_client, "Your paycheck of ~b~$" + temp.player_paycheck.ToString("N0") + " ~w~has come in!");
                 }
             }
-        }*/
+        }
+    }
 
+    void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        if (DateTime.Now.Minute == 00)
+        {
+            applyPaychecks();
+        }
+        else if (DateTime.Now.Minute != 00 && timer_debouce == false)
+        {
+            timer_debouce = true;
+        }
     }
 
     public void ExplodeAllTiresShape(ColShape shape, NetHandle entity)
@@ -771,10 +838,17 @@ public class server_core_remaster_2 : Script
         player_data.player_rotation = API.getEntityRotation(player);
         player_database[index] = player_data;
 
-        //PlayerData plr = new PlayerData(null, -1, (PedHash)123, "bigballer", "Test_Mcbutt", "123");
-        var bsonObj = player_data.ToBsonDocument();
-        var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], player_data.Id);
-        var result = collection.ReplaceOne(filter, bsonObj, new UpdateOptions { IsUpsert = true });
+        if (client.Cluster.Description.State.ToString() == "Disconnected")
+        {
+            API.consoleOutput("MongoDB database is offline!");
+        }
+        else
+        {
+            API.consoleOutput("_id -> " + player_data.Id.ToString() + " has been pushed into the database.");
+            var bsonObj = player_data.ToBsonDocument();
+            var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], player_data.Id);
+            var result = collection_players.ReplaceOne(filter, bsonObj, new UpdateOptions { IsUpsert = true });
+        }
 
     }
 
@@ -823,6 +897,7 @@ public class server_core_remaster_2 : Script
             }
         }
     }
+
     private static readonly object syncLock = new object();
     public static bool randomBool()
     {
@@ -832,9 +907,6 @@ public class server_core_remaster_2 : Script
             return prob <= 70;
         }
     }
-
-    public int dealership_1_spawn_counter = 0;
-    public int dealership_dim = 0;
 
     public void OnClientEventTriggerHandler(Client player, string eventName, params object[] args)
     {
@@ -907,6 +979,26 @@ public class server_core_remaster_2 : Script
             API.setEntityDimension(player, 0);
             API.setEntityPosition(player, new Vector3(-61.70732, -1093.239, 26));
             dealership_dim--;
+        }
+    }
+
+    public void OnPlayerEnterVehicleHandler(Client player, NetHandle veh)
+    {
+        int veh_indx = getVehicleIndexByVehicle(veh);
+        int plr_indx = getPlayerDatabaseIndexByClient(player);
+        if (veh_indx != -1 && plr_indx != -1)
+        {
+            vehicle_database[veh_indx].driver = player_database[plr_indx].player_display_name;
+        }
+    }
+
+    public void OnPlayerExitVehicleHandler(Client player, NetHandle veh)
+    {
+        int veh_indx = getVehicleIndexByVehicle(veh);
+        int plr_indx = getPlayerDatabaseIndexByClient(player);
+        if (veh_indx != -1 && plr_indx != -1)
+        {
+            vehicle_database[veh_indx].driver = "null";
         }
     }
 
@@ -989,8 +1081,6 @@ public class server_core_remaster_2 : Script
             //Change player data and log him in
             PlayerData plr_temp = player_database[indx];
             plr_temp.player_logged = true;
-            API.setEntityPosition(player, plr_temp.player_position);
-            API.setEntityRotation(player, plr_temp.player_rotation);
             API.setEntityPositionFrozen(player, false);
             API.setEntityTransparency(player, 255);
             API.setEntityInvincible(player, false);
@@ -1025,6 +1115,27 @@ public class server_core_remaster_2 : Script
                     API.triggerClientEvent(player, "sync_vehicle_door_state", 2, vehs[i], API.getEntitySyncedData(vehs[i], "door3"));
                 if (API.getEntitySyncedData(vehs[i], "door4") != null)
                     API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
+            }
+
+            bool set_in_car = false;
+            API.consoleOutput("Vehicle DB length: " + vehicle_database.Count().ToString());
+            for(int i = 0; i < vehicle_database.Count; i++)
+            {
+                if (vehicle_database[i].driver.ToLower() == player_database[indx].player_display_name.ToLower())
+                {
+                    if(vehicle_database[i].vehicle_object != null)
+                    {
+                        API.setPlayerIntoVehicle(player, vehicle_database[i].vehicle_object, -1);
+                        set_in_car = true;
+                    }
+                    break;
+                }
+            }
+
+            if(set_in_car == false)
+            {
+                API.setEntityPosition(player, plr_temp.player_position);
+                API.setEntityRotation(player, plr_temp.player_rotation);
             }
         }
         else
@@ -1131,6 +1242,29 @@ public class server_core_remaster_2 : Script
     public void spawnCarFunc(Client player, string carname)
     {
         spawnCar(player, carname, false, new Vector3(0.0, 0.0, 0.0), new Vector3(0.0, 0.0, 0.0), 0, 0, true, 0);
+    }
+
+    public void spawnExistingCar(ref VehicleData veh)
+    {
+        veh.vehicle_object = API.createVehicle(API.vehicleNameToModel(veh.car_model_name), veh.vehicle_position, veh.vehicle_rotation, veh.vehicle_primary_color, veh.vehicle_secondary_color);
+        veh.vehicle_id = getRandomIDVehiclePool();
+        API.setVehicleNumberPlate(veh.vehicle_object, veh.vehicle_license);
+        API.setVehicleEngineStatus(veh.vehicle_object, false);
+        API.setVehicleLocked(veh.vehicle_object, true);
+        API.setEntitySyncedData(veh.vehicle_object, "id", (int)veh.vehicle_id);
+        API.setEntitySyncedData(veh.vehicle_object, "owner", (string)veh.vehicle_owner);
+        API.setEntitySyncedData(veh.vehicle_object, "plate", (string)veh.vehicle_license);
+        API.setEntitySyncedData(veh.vehicle_object, "engine", false);
+        API.setEntitySyncedData(veh.vehicle_object, "indicator_right", false);
+        API.setEntitySyncedData(veh.vehicle_object, "indicator_left", false);
+        API.setEntitySyncedData(veh.vehicle_object, "locked", true);
+        API.setEntitySyncedData(veh.vehicle_object, "trunk", false);
+        API.setEntitySyncedData(veh.vehicle_object, "hood", false);
+        API.setEntitySyncedData(veh.vehicle_object, "door1", false);
+        API.setEntitySyncedData(veh.vehicle_object, "door2", false);
+        API.setEntitySyncedData(veh.vehicle_object, "door3", false);
+        API.setEntitySyncedData(veh.vehicle_object, "door4", false);
+        API.setEntitySyncedData(veh.vehicle_object, "attached", false);
     }
 
     public void spawnCar(Client player, string carname, bool forcePos, Vector3 pos, Vector3 rot, int color1, int color2, bool owned, int dim)
@@ -1586,9 +1720,6 @@ public class server_core_remaster_2 : Script
             API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
         }
     }
-
-
-    
 
     [Command("attachcar")]
     public void attachCarCommand(Client player)
@@ -2257,11 +2388,21 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("trythis")]
-    public void testFunc(Client player)
+    [Command("time")]
+    public void timeFunc(Client player)
     {
-        NetHandle veh = API.getPlayerVehicle(player);
+        API.sendChatMessageToPlayer(player, "Current Time: ~b~ " + DateTime.Now.ToString());
+    }
 
+    [Command("setpaycheck", GreedyArg = true)]
+    public void setPayCheckFunc(Client player, string arg)
+    {
+        long paycheck = Convert.ToInt64(arg);
+        int indx = getPlayerDatabaseIndexByClient(player);
+        PlayerData temp = player_database[indx];
+        temp.player_paycheck = paycheck;
+        player_database[indx] = temp;
+        API.sendChatMessageToPlayer(player, "Paycheck applied.");
     }
 }
 
