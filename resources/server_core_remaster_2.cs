@@ -162,6 +162,7 @@ public class server_core_remaster_2 : Script
 
     public class ObjectData
     {
+        [BsonId]
         public ObjectId Id { get; set; }
         public int id { get; set; }
         public int obj_id { get; set; }
@@ -173,6 +174,7 @@ public class server_core_remaster_2 : Script
         public ObjectData(int id_par, int obj_id_par, NetHandle obj_par, bool is_static_par, string name_par)
         {
             this.Id = new ObjectId();
+            this.Id = ObjectId.GenerateNewId();
             this.id = id_par;
             this.obj_id = obj_id_par;
             this.obj = obj_par;
@@ -183,6 +185,8 @@ public class server_core_remaster_2 : Script
 
         public ObjectData()
         {
+            this.Id = new ObjectId();
+            this.Id = ObjectId.GenerateNewId();
             this.id = -1;
             this.obj_id = -1;
             this.obj = new NetHandle();
@@ -195,6 +199,7 @@ public class server_core_remaster_2 : Script
 
     public class VehicleData
     {
+        [BsonId]
         public ObjectId Id { get; set; }
         [BsonIgnore]
         public Vehicle vehicle_object { get; set; }
@@ -219,6 +224,7 @@ public class server_core_remaster_2 : Script
         public VehicleData(Vehicle hash, int id, string model_name, Vector3 pos, Vector3 rot, string license, string owner, string faction)
         {
             this.Id = new ObjectId();
+            this.Id = ObjectId.GenerateNewId();
             this.vehicle_object = hash;
             this.vehicle_id = id;
 
@@ -238,11 +244,18 @@ public class server_core_remaster_2 : Script
             this.vehicle_color = "Black";
             this.vehicle_inventory = new List<ObjectData>();
         }
+
+        public VehicleData()
+        {
+            this.Id = new ObjectId();
+            this.Id = ObjectId.GenerateNewId();
+        }
     }
 
 
     public class PlayerData
     {
+        [BsonId]
         public ObjectId Id { get; set; }
 
         [BsonIgnore]
@@ -271,6 +284,7 @@ public class server_core_remaster_2 : Script
         public PlayerData(Client player, int id, PedHash ped_hash, string player_name, string display_name, string password)
         {
             this.Id = new ObjectId();
+            this.Id = ObjectId.GenerateNewId();
             this.player_client = player;
             this.player_id = id;
             this.player_display_name = display_name;
@@ -291,6 +305,12 @@ public class server_core_remaster_2 : Script
 
             this.player_vehicles_owned = 0;
             this.player_inventory = new List<ObjectData>();
+        }
+
+        public PlayerData()
+        {
+            this.Id = new ObjectId();
+            this.Id = ObjectId.GenerateNewId();
         }
     }
 
@@ -2339,8 +2359,9 @@ public class server_core_remaster_2 : Script
     [Command("setcolor", GreedyArg = true)]
     public void setColorFunc(Client player, string colorname)
     {
-        if(API.isPlayerInAnyVehicle(player))
+        if (API.isPlayerInAnyVehicle(player))
         {
+            int veh_indx = getVehicleIndexByVehicle(API.getPlayerVehicle(player));
             for (int i = 0; i < color_names.Length; i++)
             {
                 if (color_names[i].color_name == colorname)
@@ -2348,6 +2369,14 @@ public class server_core_remaster_2 : Script
                     int rndclr = rnd.Next(0, color_names[i].colors.Length);
                     API.setVehiclePrimaryColor(API.getPlayerVehicle(player), color_names[i].colors[rndclr]);
                     API.setVehicleSecondaryColor(API.getPlayerVehicle(player), color_names[i].colors[rndclr]);
+
+                    if(veh_indx != -1)
+                    {
+                        vehicle_database[veh_indx].vehicle_primary_color = color_names[i].colors[rndclr];
+                        vehicle_database[veh_indx].vehicle_secondary_color = color_names[i].colors[rndclr];
+                        vehicle_database[veh_indx].vehicle_color = color_names[i].color_name;
+                    }
+
                     break;
                 }
             }
