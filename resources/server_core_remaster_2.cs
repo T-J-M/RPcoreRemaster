@@ -1271,6 +1271,14 @@ public class server_core_remaster_2 : Script
                 hash = API.createVehicle(API.vehicleNameToModel(carname), API.getEntityPosition(player), API.getEntityRotation(player), 0, 0, dim);
             //API.setVehicleNumberPlate(hash, "TJM");
             VehicleData temp = new VehicleData(hash, getRandomIDVehiclePool(), carname, API.getEntityPosition(hash), API.getEntityRotation(hash), "tjm000", player_database[indx].player_display_name, "civillian");
+            const string strng = "ABCDEFGHJKLMNOPQRSTUVWXYZ0123456789";
+            char[] chars = new char[6];
+            for(int i = 0; i < 6; i++)
+            {
+                chars[i] = strng[rnd.Next(0, strng.Length)];
+            }
+
+            temp.vehicle_license = new string(chars);
             API.setEntitySyncedData(temp.vehicle_object, "id", (int)temp.vehicle_id);
             API.setEntitySyncedData(temp.vehicle_object, "owner", (string)temp.vehicle_owner);
             API.setEntitySyncedData(temp.vehicle_object, "plate", (string)temp.vehicle_license);
@@ -1803,11 +1811,11 @@ public class server_core_remaster_2 : Script
         }
     }
 
-    [Command("license", "Usage: /license ~b~(plate #)", GreedyArg = true)]
+    [Command("runplate", "Usage: /license ~b~(plate #)", GreedyArg = true)]
     public void carinfoFunc(Client player, string license)
     {
         //API.triggerClientEvent(player, "vehicle_draw_text", temp.vehicle_hash, temp.vehicle_id, temp.owner_name, temp.license_plate);
-        license = license.ToUpper(); //Get lowercase string for lazy people
+        license = license.ToLower(); //Get lowercase string for lazy people
         int indx = getPlayerDatabaseIndexByClient(player);
         if (player_database[indx].player_faction == "police")
         {
@@ -1816,15 +1824,15 @@ public class server_core_remaster_2 : Script
             bool found = false;
             for (int i = 0; i < vehs.Count; i++)
             {
-                if (API.getVehicleNumberPlate(vehs[i]).ToLower() == license)
+                if (API.getVehicleNumberPlate(vehs[i]).ToLower() == license.ToLower())
                 {
                     //Display data about car
                     API.sendChatMessageToPlayer(player, "Vehicle is ~g~registered ~w~in database!");
                     var model = API.getEntityModel(vehs[i]);
                     int carindx = getVehicleIndexByVehicle(vehs[i]);
                     string plr_nm = vehicle_database[carindx].vehicle_owner;
-                    API.sendChatMessageToPlayer(player, "Model: ~b~" + getVehicleName(vehs[i]) + " ~w~-~b~|~w~- Color: ~b~" + vehicle_database[carindx].vehicle_color);
-                    API.sendChatMessageToPlayer(player, "License Plate: ~b~" + license);
+                    API.sendChatMessageToPlayer(player, "Model: ~b~" + getVehicleName(vehs[i]) + " ~b~=+= ~w~Color: ~b~" + vehicle_database[carindx].vehicle_color);
+                    API.sendChatMessageToPlayer(player, "License Plate: ~b~" + license.ToUpper());
                     API.sendChatMessageToPlayer(player, "Owner: ~b~" + plr_nm);
                     found = true;
                 }
