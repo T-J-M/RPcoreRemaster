@@ -172,6 +172,7 @@ public class server_core_remaster_2 : Script
         public string name { get; set; }
         public ObjectData(int id_par, int obj_id_par, NetHandle obj_par, bool is_static_par, string name_par)
         {
+            this.Id = new ObjectId();
             this.id = id_par;
             this.obj_id = obj_id_par;
             this.obj = obj_par;
@@ -217,6 +218,7 @@ public class server_core_remaster_2 : Script
 
         public VehicleData(Vehicle hash, int id, string model_name, Vector3 pos, Vector3 rot, string license, string owner, string faction)
         {
+            this.Id = new ObjectId();
             this.vehicle_object = hash;
             this.vehicle_id = id;
 
@@ -268,6 +270,7 @@ public class server_core_remaster_2 : Script
 
         public PlayerData(Client player, int id, PedHash ped_hash, string player_name, string display_name, string password)
         {
+            this.Id = new ObjectId();
             this.player_client = player;
             this.player_id = id;
             this.player_display_name = display_name;
