@@ -494,12 +494,6 @@ public class server_core_remaster_2 : Script
                         //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
                         API.consoleOutput("Found vehicle: " + obj.car_model_name + " -> " + obj.Id.ToString());
                         spawnExistingCar(ref obj);
-                        API.setEntitySyncedData(obj.vehicle_object, "tyre_0_popped", false);
-                        API.setEntitySyncedData(obj.vehicle_object, "tyre_1_popped", false);
-                        API.setEntitySyncedData(obj.vehicle_object, "tyre_2_popped", false);
-                        API.setEntitySyncedData(obj.vehicle_object, "tyre_3_popped", false);
-                        API.setEntitySyncedData(obj.vehicle_object, "tyre_4_popped", false);
-                        API.setEntitySyncedData(obj.vehicle_object, "tyre_5_popped", false);
                         vehicle_database.Add(obj);
                     }
                 }
@@ -1251,6 +1245,17 @@ public class server_core_remaster_2 : Script
         API.setEntitySyncedData(veh.vehicle_object, "door3", false);
         API.setEntitySyncedData(veh.vehicle_object, "door4", false);
         API.setEntitySyncedData(veh.vehicle_object, "attached", false);
+
+        API.setEntitySyncedData(veh.vehicle_object, "tyre_0_popped", false);
+        API.setEntitySyncedData(veh.vehicle_object, "tyre_1_popped", false);
+        API.setEntitySyncedData(veh.vehicle_object, "tyre_2_popped", false);
+        API.setEntitySyncedData(veh.vehicle_object, "tyre_3_popped", false);
+        API.setEntitySyncedData(veh.vehicle_object, "tyre_4_popped", false);
+        API.setEntitySyncedData(veh.vehicle_object, "tyre_5_popped", false);
+
+        API.setVehiclePrimaryColor(veh.vehicle_object, veh.vehicle_primary_color);
+        API.setVehicleSecondaryColor(veh.vehicle_object, veh.vehicle_secondary_color);
+
     }
 
     public void spawnCar(Client player, string carname, bool forcePos, Vector3 pos, Vector3 rot, int color1, int color2, bool owned, int dim)
