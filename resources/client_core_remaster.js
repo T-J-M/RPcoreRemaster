@@ -297,6 +297,9 @@ var max_height = 0.0;
 var oldTime = API.getGameTime();
 var isClosing = true;
 
+var outofcontrol_called = false;
+var overridecontrol_called = false;
+
 API.onUpdate.connect(function () {
     API.drawMenu(anim_menu);
     API.drawMenu(anim_sub_menu);
@@ -309,9 +312,11 @@ API.onUpdate.connect(function () {
         var is_veh_allwheels = API.returnNative("IS_VEHICLE_ON_ALL_WHEELS", 8, API.getPlayerVehicle(API.getLocalPlayer()));
         if (is_onroof_stuck === true) {
             API.callNative("SET_VEHICLE_OUT_OF_CONTROL", API.getPlayerVehicle(API.getLocalPlayer()), false, false);
+            outofcontrol_called = true;
         }
         else if (is_veh_allwheels === false) {
             API.callNative("SET_VEHICLE_OUT_OF_CONTROL", API.getPlayerVehicle(API.getLocalPlayer()), false, false);
+            outofcontrol_called = true;
             var newheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
             if (newheight > max_height) {
                 max_height = newheight;
@@ -322,7 +327,6 @@ API.onUpdate.connect(function () {
         }
 
         if (is_veh_allwheels === true && call_midair === true) {
-
             var currheight = API.returnNative("GET_ENTITY_HEIGHT_ABOVE_GROUND", 7, API.getPlayerVehicle(API.getLocalPlayer()));
             var diff = Math.abs(max_height - currheight);
             if (diff > 2.0) {
@@ -332,11 +336,15 @@ API.onUpdate.connect(function () {
             max_height = 0.0;
             call_midair = false;
         }
+
+        if (outofcontrol_called && is_veh_allwheels && overridecontrol_called == false)
+        {
+            outofcontrol_called = false;
+            API.setPlayerIntoVehicle(API.getPlayerVehicle(API.getLocalPlayer()), -1);
+        }
     }
 });
 
-var sound_horn_on_debounce = true;
-var sound_horn_off_debounce = false;
 
 API.onKeyUp.connect(function (sender, e) {
     if(!API.isChatOpen())
@@ -348,11 +356,6 @@ API.onKeyUp.connect(function (sender, e) {
                 }
                 else if (e.KeyCode === Keys.K) {
                     API.triggerServerEvent("indicator_right");
-                }
-                else if (e.KeyCode == Keys.E && sound_horn_off_debounce) {
-                    sound_horn_off_debounce = false;
-                    API.triggerServerEvent("sound_horn_off");
-                    sound_horn_on_debounce = true;
                 }
                 else if (e.KeyCode === Keys.F && inside_car_showroom === true) {
                     confirm_menu.Visible = false;
@@ -380,13 +383,15 @@ API.onKeyDown.connect(function (sender, e) {
         {
             if(API.getPlayerVehicleSeat(API.getLocalPlayer()) == -1)
             {
-                if(e.KeyCode === Keys.E && sound_horn_on_debounce)
+                if(e.KeyCode === Keys.F)
                 {
-                    sound_horn_on_debounce = false;
-                    API.triggerServerEvent("sound_horn_on");
-                    sound_horn_off_debounce = true;
+                    overridecontrol_called = true;
                 }
             }
+        }
+        else if(overridecontrol_called)
+        {
+            overridecontrol_called = false;
         }
     }
 });

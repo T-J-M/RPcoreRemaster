@@ -471,6 +471,12 @@ public class server_core_remaster_2 : Script
                         //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
                         API.consoleOutput("Found vehicle: " + obj.car_model_name + " -> " + obj.Id.ToString());
                         spawnExistingCar(ref obj);
+                        API.setEntitySyncedData(obj.vehicle_object, "tyre_0_popped", false);
+                        API.setEntitySyncedData(obj.vehicle_object, "tyre_1_popped", false);
+                        API.setEntitySyncedData(obj.vehicle_object, "tyre_2_popped", false);
+                        API.setEntitySyncedData(obj.vehicle_object, "tyre_3_popped", false);
+                        API.setEntitySyncedData(obj.vehicle_object, "tyre_4_popped", false);
+                        API.setEntitySyncedData(obj.vehicle_object, "tyre_5_popped", false);
                         vehicle_database.Add(obj);
                     }
                 }
@@ -975,21 +981,6 @@ public class server_core_remaster_2 : Script
             API.setEntityDimension(player, 0);
             API.setEntityPosition(player, new Vector3(-61.70732, -1093.239, 26));
             dealership_dim--;
-        }
-        else if(eventName == "sound_horn_on")
-        {
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.OVERRIDE_VEH_HORN, API.getPlayerVehicle(player), false, 0);
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.START_VEHICLE_HORN, API.getPlayerVehicle(player), 10, API.getHashKey("HELDDOWN"), true);
-        }
-        else if(eventName == "sound_horn_off")
-        {
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.OVERRIDE_VEH_HORN, API.getPlayerVehicle(player), true, 0);
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.START_VEHICLE_HORN, API.getPlayerVehicle(player), 1, API.getHashKey("NORMAL"), false);
-        }
-        else if(eventName == "sound_siren_toggle")
-        {
-            //hash collision
-            API.sendNativeToAllPlayers(GTANetworkServer.Hash.DISABLE_VEHICLE_IMPACT_EXPLOSION_ACTIVATION, API.getPlayerVehicle(player), !API.getVehicleSirenState(API.getPlayerVehicle(player)));
         }
     }
 
