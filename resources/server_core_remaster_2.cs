@@ -51,7 +51,6 @@ public class server_core_remaster_2 : Script
         API.onChatMessage += OnChatMessageHandler;
         API.onChatCommand += OnChatCommandHandler;
         API.onPlayerDisconnected += OnPlayerDisconnectedHandler;
-        API.onPlayerEnterVehicle += OnPlayerEnterVehicleHandler;
         Blip newblip = API.createBlip(new Vector3(-61.70732, -1093.239, 26.4819));
         API.setBlipSprite(newblip, 380);
         API.setBlipColor(newblip, 47);
@@ -214,8 +213,6 @@ public class server_core_remaster_2 : Script
         public string vehicle_owner { get; set; }
         public string vehicle_faction { get; set; }
 
-        public string driver { get; set; }
-
         public List<ObjectData> vehicle_inventory { get; set; }
 
         public VehicleData(Vehicle hash, int id, string model_name, Vector3 pos, Vector3 rot, string license, string owner, string faction)
@@ -237,7 +234,6 @@ public class server_core_remaster_2 : Script
             this.vehicle_primary_color = 0;
             this.vehicle_secondary_color = 0;
             this.vehicle_color = "Black";
-            this.driver = "";
             this.vehicle_inventory = new List<ObjectData>();
         }
     }
@@ -980,25 +976,20 @@ public class server_core_remaster_2 : Script
             API.setEntityPosition(player, new Vector3(-61.70732, -1093.239, 26));
             dealership_dim--;
         }
-    }
-
-    public void OnPlayerEnterVehicleHandler(Client player, NetHandle veh)
-    {
-        int veh_indx = getVehicleIndexByVehicle(veh);
-        int plr_indx = getPlayerDatabaseIndexByClient(player);
-        if (veh_indx != -1 && plr_indx != -1)
+        else if(eventName == "sound_horn_on")
         {
-            vehicle_database[veh_indx].driver = player_database[plr_indx].player_display_name;
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.OVERRIDE_VEH_HORN, API.getPlayerVehicle(player), false, 0);
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.START_VEHICLE_HORN, API.getPlayerVehicle(player), 10, API.getHashKey("HELDDOWN"), true);
         }
-    }
-
-    public void OnPlayerExitVehicleHandler(Client player, NetHandle veh)
-    {
-        int veh_indx = getVehicleIndexByVehicle(veh);
-        int plr_indx = getPlayerDatabaseIndexByClient(player);
-        if (veh_indx != -1 && plr_indx != -1)
+        else if(eventName == "sound_horn_off")
         {
-            vehicle_database[veh_indx].driver = "null";
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.OVERRIDE_VEH_HORN, API.getPlayerVehicle(player), true, 0);
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.START_VEHICLE_HORN, API.getPlayerVehicle(player), 1, API.getHashKey("NORMAL"), false);
+        }
+        else if(eventName == "sound_siren_toggle")
+        {
+            //hash collision
+            API.sendNativeToAllPlayers(GTANetworkServer.Hash.DISABLE_VEHICLE_IMPACT_EXPLOSION_ACTIVATION, API.getPlayerVehicle(player), !API.getVehicleSirenState(API.getPlayerVehicle(player)));
         }
     }
 
@@ -1085,6 +1076,8 @@ public class server_core_remaster_2 : Script
             API.setEntityTransparency(player, 255);
             API.setEntityInvincible(player, false);
             API.setEntityCollisionless(player, false);
+            API.setEntityPosition(player, plr_temp.player_position);
+            API.setEntityRotation(player, plr_temp.player_rotation);
             player_database[indx] = plr_temp;
 
             API.setPlayerNametag(player, plr_temp.player_display_name);
@@ -1115,27 +1108,6 @@ public class server_core_remaster_2 : Script
                     API.triggerClientEvent(player, "sync_vehicle_door_state", 2, vehs[i], API.getEntitySyncedData(vehs[i], "door3"));
                 if (API.getEntitySyncedData(vehs[i], "door4") != null)
                     API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
-            }
-
-            bool set_in_car = false;
-            API.consoleOutput("Vehicle DB length: " + vehicle_database.Count().ToString());
-            for(int i = 0; i < vehicle_database.Count; i++)
-            {
-                if (vehicle_database[i].driver.ToLower() == player_database[indx].player_display_name.ToLower())
-                {
-                    if(vehicle_database[i].vehicle_object != null)
-                    {
-                        API.setPlayerIntoVehicle(player, vehicle_database[i].vehicle_object, -1);
-                        set_in_car = true;
-                    }
-                    break;
-                }
-            }
-
-            if(set_in_car == false)
-            {
-                API.setEntityPosition(player, plr_temp.player_position);
-                API.setEntityRotation(player, plr_temp.player_rotation);
             }
         }
         else

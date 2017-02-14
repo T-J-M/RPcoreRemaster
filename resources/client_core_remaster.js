@@ -335,6 +335,8 @@ API.onUpdate.connect(function () {
     }
 });
 
+var sound_horn_on_debounce = true;
+var sound_horn_off_debounce = false;
 
 API.onKeyUp.connect(function (sender, e) {
     if(!API.isChatOpen())
@@ -346,6 +348,11 @@ API.onKeyUp.connect(function (sender, e) {
                 }
                 else if (e.KeyCode === Keys.K) {
                     API.triggerServerEvent("indicator_right");
+                }
+                else if (e.KeyCode == Keys.E && sound_horn_off_debounce) {
+                    sound_horn_off_debounce = false;
+                    API.triggerServerEvent("sound_horn_off");
+                    sound_horn_on_debounce = true;
                 }
                 else if (e.KeyCode === Keys.F && inside_car_showroom === true) {
                     confirm_menu.Visible = false;
@@ -363,5 +370,23 @@ API.onKeyUp.connect(function (sender, e) {
             API.destroyCefBrowser(mainBrowser);
         mainBrowser = null;
         API.showCursor(false);
+    }
+});
+
+API.onKeyDown.connect(function (sender, e) {
+    if(!API.isChatOpen())
+    {
+        if(API.isPlayerInAnyVehicle(API.getLocalPlayer()))
+        {
+            if(API.getPlayerVehicleSeat(API.getLocalPlayer()) == -1)
+            {
+                if(e.KeyCode === Keys.E && sound_horn_on_debounce)
+                {
+                    sound_horn_on_debounce = false;
+                    API.triggerServerEvent("sound_horn_on");
+                    sound_horn_off_debounce = true;
+                }
+            }
+        }
     }
 });
