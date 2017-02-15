@@ -1,4 +1,5 @@
-﻿var anim_menu = API.createMenu("Animation List", "Category", 0, 0, 6);
+﻿
+var anim_menu = API.createMenu("Animation List", "Category", 0, 0, 6);
 var anim_sub_menu = API.createMenu("-null_category-", "Name(s): ", 0, 0, 6);
 var catalog_menu = API.createMenu("-null_catalog-", "-null_types-", 0, 0, 6);
 var confirm_menu = API.createMenu("Purchase", "Confirm purchase:", 0, 0, 6);
@@ -261,17 +262,8 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             anim_menu.Visible = false;
             anim_sub_menu.Visible = false;
             break;
-        case 'cef_test':
-            API.sendChatMessage("cef_test_call");
-            mainBrowser = API.createCefBrowser(1000.0, 500.0, true);
-            API.waitUntilCefBrowserInit(mainBrowser);
-            API.sendChatMessage("RES Y: " + res.Height);
-            API.setCefBrowserPosition(mainBrowser, res.Width / 2.0 - (1000.0) / 2.0, res.Height / 2.0 - (500.0) / 2.0);
-            API.loadPageCefBrowser(mainBrowser, "bankpin.html");
-            API.showCursor(true);
-            break;
         case 'create_label':
-            var label = API.createTextLabel(args[0] + "\n/catalog", args[1], 10.0, 1.0);
+            var label = API.createTextLabel(args[0], args[1], 10.0, 1.0);
             text_labels.push(label);
             break;
         case 'delete_all_labels':
@@ -286,6 +278,36 @@ API.onServerEventTrigger.connect(function (eventName, args) {
         case 'sync_vehicle_door_damage':
             if (args[2] === true)
                 API.callNative('0xD4D4F6A4AB575A33', args[1], args[0], true);
+            break;
+        case 'atm_list':
+            API.sendChatMessage("cef_atm_call");
+            mainBrowser = API.createCefBrowser(1000.0, 500.0, true);
+            API.waitUntilCefBrowserInit(mainBrowser);
+            API.sendChatMessage("RES Y: " + res.Height);
+            API.setCefBrowserPosition(mainBrowser, res.Width / 2.0 - (1000.0) / 2.0, res.Height / 2.0 - (500.0) / 2.0);
+            API.loadPageCefBrowser(mainBrowser, "bankpinlogin.html");
+            API.showCursor(true);
+            break;
+        case 'close_cef':
+            if (mainBrowser !== null)
+                API.destroyCefBrowser(mainBrowser);
+            mainBrowser = null;
+            API.showCursor(false);
+            break;
+        case 'failed_pin':
+            if (mainBrowser !== null)
+                mainBrowser.call("failpin");
+            break;
+        case 'success_pin':
+            if (mainBrowser !== null)
+                mainBrowser.call("successpin");
+                loginBank();
+            break;
+        case 'pulled_bankdata':
+            API.sendChatMessage("pulleddata");
+            API.sendChatMessage(args[0]);
+            API.sendChatMessage(args[1]);
+            applyBankData(args[0], args[1]);
             break;
            
     }
@@ -368,7 +390,7 @@ API.onKeyUp.connect(function (sender, e) {
             }
         }
     }
-    else if (e.KeyCode === Keys.Escape) {
+    else if (e.KeyCode === Keys.M) {
         if (mainBrowser !== null)
             API.destroyCefBrowser(mainBrowser);
         mainBrowser = null;
@@ -395,3 +417,32 @@ API.onKeyDown.connect(function (sender, e) {
         }
     }
 });
+
+function checkPinNumber(val)
+{
+    API.sendChatMessage("Pin Detected: " + val);
+    API.triggerServerEvent("check_bank_pin", val);
+}
+
+function exitBrowser()
+{
+    if (mainBrowser !== null)
+        API.destroyCefBrowser(mainBrowser);
+    //mainBrowser = null;
+    API.showCursor(false);
+}
+
+function loginBank()
+{
+    API.triggerServerEvent("fetch_bankdata");
+}
+
+function applyBankData(name, sum)
+{
+    if (mainBrowser !== null)
+    {
+        //API.waitUntilCefBrowserInit(mainBrowser);
+        mainBrowser.call("changeName", name + "", sum + "");
+    }
+
+}

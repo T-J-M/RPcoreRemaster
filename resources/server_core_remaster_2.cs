@@ -51,12 +51,69 @@ public class server_core_remaster_2 : Script
         API.onChatMessage += OnChatMessageHandler;
         API.onChatCommand += OnChatCommandHandler;
         API.onPlayerDisconnected += OnPlayerDisconnectedHandler;
-        Blip newblip = API.createBlip(new Vector3(-61.70732, -1093.239, 26.4819));
-        API.setBlipSprite(newblip, 380);
-        API.setBlipColor(newblip, 47);
-        API.setBlipScale(newblip, 1.0f);
-        API.setBlipShortRange(newblip, true);
-        blip_database.Add(newblip);
+        Blip dealership_1_blip = API.createBlip(new Vector3(-61.70732, -1093.239, 26.4819));
+        API.setBlipSprite(dealership_1_blip, 380);
+        API.setBlipColor(dealership_1_blip, 47);
+        API.setBlipScale(dealership_1_blip, 1.0f);
+        API.setBlipShortRange(dealership_1_blip, true);
+        blip_database.Add(dealership_1_blip);
+
+        Blip clothes_1_blip = API.createBlip(new Vector3(83.10322, -1391.61, 29.41762));
+        API.setBlipSprite(clothes_1_blip, 73);
+        API.setBlipColor(clothes_1_blip, 18);
+        API.setBlipScale(clothes_1_blip, 1.0f);
+        API.setBlipShortRange(clothes_1_blip, true);
+        blip_database.Add(clothes_1_blip);
+
+        Blip seveneleven_1_blip = API.createBlip(new Vector3(29.47646, -1345.331, 29.49702));
+        API.setBlipSprite(seveneleven_1_blip, 52);
+        API.setBlipColor(seveneleven_1_blip, 66);
+        API.setBlipScale(seveneleven_1_blip, 1.0f);
+        API.setBlipShortRange(seveneleven_1_blip, true);
+        blip_database.Add(seveneleven_1_blip);
+
+        Blip seveneleven_2_blip = API.createBlip(new Vector3(-48.81896, -1756.122, 29.42099));
+        API.setBlipSprite(seveneleven_2_blip, 52);
+        API.setBlipColor(seveneleven_2_blip, 66);
+        API.setBlipScale(seveneleven_2_blip, 1.0f);
+        API.setBlipShortRange(seveneleven_2_blip, true);
+        blip_database.Add(seveneleven_2_blip);
+
+        Blip carwash_1_blip = API.createBlip(new Vector3(50.31694, -1393.075, 29.00219));
+        API.setBlipSprite(carwash_1_blip, 100);
+        API.setBlipColor(carwash_1_blip, 32);
+        API.setBlipScale(carwash_1_blip, 1.0f);
+        API.setBlipShortRange(carwash_1_blip, true);
+        blip_database.Add(carwash_1_blip);
+
+        Blip cargas_1_blip = API.createBlip(new Vector3(-71.19863, -1757.016, 29.03245));
+        API.setBlipSprite(cargas_1_blip, 361);
+        API.setBlipColor(cargas_1_blip, 49);
+        API.setBlipScale(cargas_1_blip, 1.0f);
+        API.setBlipShortRange(cargas_1_blip, true);
+        blip_database.Add(cargas_1_blip);
+
+        Blip atm_1_blip = API.createBlip(new Vector3(147.0421, -1034.716, 29.34404));
+        API.setBlipSprite(atm_1_blip, 434);
+        API.setBlipColor(atm_1_blip, 69);
+        API.setBlipScale(atm_1_blip, 1.0f);
+        API.setBlipShortRange(atm_1_blip, true);
+        blip_database.Add(atm_1_blip);
+
+        Blip bank_1_blip = API.createBlip(new Vector3(149.6064, -1039.721, 29.37407));
+        API.setBlipSprite(bank_1_blip, 108);
+        API.setBlipColor(bank_1_blip, 69);
+        API.setBlipScale(bank_1_blip, 1.0f);
+        API.setBlipShortRange(bank_1_blip, true);
+        blip_database.Add(bank_1_blip);
+
+        Blip publicphone_1_blip = API.createBlip(new Vector3(187.5654, -1043.799, 29.33121));
+        API.setBlipSprite(publicphone_1_blip, 459);
+        API.setBlipColor(publicphone_1_blip, 62);
+        API.setBlipScale(publicphone_1_blip, 1.0f);
+        API.setBlipShortRange(publicphone_1_blip, true);
+        blip_database.Add(publicphone_1_blip);
+
 
         timer = new System.Timers.Timer(10000);
         timer.Elapsed += timer_Elapsed;
@@ -85,6 +142,19 @@ public class server_core_remaster_2 : Script
         new Vector3(1070.206, -711.958, 70.483),
     };
 
+    Vector3[] registerspawn_locations = new Vector3[]
+    {
+        new Vector3(-1034.600, -2733.600, 13.800),
+        new Vector3(-1037.256, -2736.902, 20.16927),
+        new Vector3(-1093.557, -2746.308, 21.3594),
+        new Vector3(-1043.668, -2729.368, 20.16929),
+        new Vector3(-1026.843, -2739.599, 20.16929),
+        new Vector3(-1019.212, -2738.315, 13.75679),
+        new Vector3(-1032.755, -2742.37, 13.83),
+        new Vector3(-1048.364, -2734.464, 13.85622),
+        new Vector3(-1052.918, -2719.434, 13.75663),
+    };
+
     //Used for dealership spawn locations
     public struct DoubleVector3
     {
@@ -104,20 +174,30 @@ public class server_core_remaster_2 : Script
         public string store_type_id;
         public string item_category;
         public Vector3 location;
+        public string command;
 
-        public StoreData(string n, string item, string type, Vector3 loc)
+        public StoreData(string cmd, string n, string item, string type, Vector3 loc)
         {
             name = n;
             item_category = item;
             store_type_id = type;
             location = loc;
+            command = cmd;
         }
     }
 
     //List of stores
     StoreData[] store_locations = new StoreData[]
     {
-        new StoreData("~o~Premium Deluxe \nMotorsport", "Vehicle(s):", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
+        new StoreData("catalog", "Premium Deluxe \nMotorsport \n/catalog", "Vehicle(s):", "dealership_1", new Vector3(-61.70732, -1093.239, 26.4819)),
+        new StoreData("catalog", "Discount Store \nClothing \n/catalog", "Skin(s):", "clothes_1", new Vector3(83.10322, -1391.61, 29.41762)),
+        new StoreData("shop", "Convenience Store \n/shop", "Item(s):", "seveneleven_1", new Vector3(29.47646, -1345.331, 29.49702)),
+        new StoreData("shop", "Convenience Store \n/shop", "Item(s):", "seveneleven_2", new Vector3(-48.81896, -1756.122, 29.42099)),
+        new StoreData("wash", "Car Wash \n/wash", "null", "carwash_1", new Vector3(50.31694, -1393.075, 29.00219)),
+        new StoreData("fill", "Car Gas \n/fill", "null", "cargas_1", new Vector3(-71.19863, -1757.016, 29.03245)),
+        new StoreData("atm", "ATM \n/atm", "null", "atm_1", new Vector3(147.0421, -1034.716, 29.34404)),
+        new StoreData("bank", "Bank \n/bank", "null", "bank_1", new Vector3(149.6064, -1039.721, 29.37407)),
+        new StoreData("use", "Public Phone \n/use", "null", "publicphone_1", new Vector3(187.5654, -1043.799, 29.33121)),
     };
 
     //Store spawn locations
@@ -228,6 +308,7 @@ public class server_core_remaster_2 : Script
         public string vehicle_owner { get; set; }
         public string vehicle_faction { get; set; }
 
+        public int vehicle_gas_amount { get; set; }
         public List<ObjectData> vehicle_inventory { get; set; }
 
         public VehicleData(Vehicle hash, int id, string model_name, Vector3 pos, Vector3 rot, string license, string owner, string faction)
@@ -251,6 +332,8 @@ public class server_core_remaster_2 : Script
             this.vehicle_primary_color = 0;
             this.vehicle_secondary_color = 0;
             this.vehicle_color = "Black";
+
+            this.vehicle_gas_amount = 100;
             this.vehicle_inventory = new List<ObjectData>();
         }
 
@@ -288,6 +371,8 @@ public class server_core_remaster_2 : Script
 
         public int player_vehicles_owned { get; set; }
 
+        public string bank_pin { get; set; }
+
         public List<ObjectData> player_inventory { get; set; }
 
         public PlayerData(Client player, int id, PedHash ped_hash, string player_name, string display_name, string password)
@@ -314,6 +399,7 @@ public class server_core_remaster_2 : Script
 
             this.player_vehicles_owned = 0;
             this.player_inventory = new List<ObjectData>();
+            this.bank_pin = "1234";
         }
 
         public PlayerData()
@@ -517,8 +603,9 @@ public class server_core_remaster_2 : Script
         }
 
         API.requestIpl("shr_int"); //Load Deluxe Motorsport interior
-        API.removeIpl("fakeint"); //Remove the fake Deluxe Motorsport interior
-
+        // API.requestIpl("shutter_closed");
+        API.removeIpl("fakeint"); //Remove the fake Deluxe Motorsport interior  
+        //API.requestIpl("v_carshowroom");
         API.consoleOutput("Server_Core has initialised.");
     }
 
@@ -761,6 +848,12 @@ public class server_core_remaster_2 : Script
             else
                 API.setEntitySyncedData(vehs[i], "door4", false);
         }
+
+        //Enable doors
+        //void SET_STATE_OF_CLOSEST_DOOR_OF_TYPE(Hash type, float x, float y,
+        //float z, BOOL locked, float heading, BOOL p6)
+        //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_STATE_OF_CLOSEST_DOOR_OF_TYPE, API.getHashKey("v_ilev_cs_door01"), 82.3186f, -1392.752f, 29.5261f, false, 1.0, false);
+        //API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_STATE_OF_CLOSEST_DOOR_OF_TYPE, API.getHashKey("v_ilev_cs_door01_r"), 82.3186f, -1390.476f, 29.5261f, false, 1.0, false);
 
     }
 
@@ -1084,6 +1177,35 @@ public class server_core_remaster_2 : Script
             API.setEntityPosition(player, new Vector3(-61.70732, -1093.239, 26));
             dealership_dim--;
         }
+        else if(eventName == "check_bank_pin")
+        {
+            int indx = getPlayerDatabaseIndexByClient(player);
+            if (indx == -1)
+                API.triggerClientEvent(player, "failed_pin");
+            else
+            {
+                if(player_database[indx].bank_pin == (string)args[0])
+                {
+                    API.triggerClientEvent(player, "success_pin");
+                }
+                else
+                {
+                    API.triggerClientEvent(player, "failed_pin");
+                }
+            }
+        }
+        else if(eventName == "fetch_bankdata")
+        {
+            int indx = getPlayerDatabaseIndexByClient(player);
+            if (indx == -1)
+                API.triggerClientEvent(player, "pulled_bankdata", "ERROR", "FETCH_ERROR");
+            else
+            {
+                string name = player_database[indx].player_display_name;
+                string mula = "$" + player_database[indx].player_money_bank.ToString("N0");
+                API.triggerClientEvent(player, "pulled_bankdata", name, mula);
+            }
+        }
     }
 
     //Commands
@@ -1202,6 +1324,7 @@ public class server_core_remaster_2 : Script
                 if (API.getEntitySyncedData(vehs[i], "door4") != null)
                     API.triggerClientEvent(player, "sync_vehicle_door_state", 3, vehs[i], API.getEntitySyncedData(vehs[i], "door4"));
             }
+
         }
         else
         {
@@ -1230,6 +1353,15 @@ public class server_core_remaster_2 : Script
         {
             API.sendChatMessageToPlayer(player, "Please format your information correctly. (1)");
             return;
+        }
+
+        for(int i = 0; i < player_database.Count; i++)
+        {
+            if(player_database[i].player_display_name.ToLower() == name)
+            {
+                API.sendChatMessageToPlayer(player, "Name is already taken!");
+                return;
+            }
         }
 
         char[] name_delimiter = { '_' };
@@ -1266,7 +1398,7 @@ public class server_core_remaster_2 : Script
         plr_temp.player_password = password;
         plr_temp.player_display_name = firstname + "_" + lastname;
         plr_temp.player_registered = true;
-        plr_temp.player_position = new Vector3(-1034.600, -2733.600, 13.800);
+        plr_temp.player_position = registerspawn_locations[rnd.Next(0, registerspawn_locations.Length)];
         plr_temp.player_rotation = new Vector3(0.0, 0.0, 0.0);
         player_database[indx] = plr_temp;
         API.sendChatMessageToPlayer(player, "You have been registered! Use /login ~b~(password) ~w~to login.");
@@ -2443,7 +2575,7 @@ public class server_core_remaster_2 : Script
     }
 
     [Command("catalog")]
-    public void purchaseFunc(Client player)
+    public void catalogFunc(Client player)
     {
         if (!API.isPlayerInAnyVehicle(player))
         {
@@ -2454,7 +2586,7 @@ public class server_core_remaster_2 : Script
             {
                 float currdist = vecdist(plr_pos, store_locations[i].location);
 
-                if (currdist < smallest_dist)
+                if (currdist < smallest_dist && store_locations[i].command == "catalog")
                 {
                     smallest_dist = currdist;
                     store_index = i;
@@ -2475,7 +2607,82 @@ public class server_core_remaster_2 : Script
         {
             API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
         }
+    }
 
+    [Command("shop")]
+    public void shopFunc(Client player)
+    {
+        if (!API.isPlayerInAnyVehicle(player))
+        {
+            Vector3 plr_pos = API.getEntityPosition(player);
+            float smallest_dist = 100.0f;
+            int store_index = -1;
+            for (int i = 0; i < store_locations.Length; i++)
+            {
+                float currdist = vecdist(plr_pos, store_locations[i].location);
+
+                if (currdist < smallest_dist && store_locations[i].command == "shop")
+                {
+                    smallest_dist = currdist;
+                    store_index = i;
+                }
+            }
+
+            if (smallest_dist < 2.0f && store_index != -1)
+            {
+                API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
+                API.triggerClientEvent(player, "shop_list", store_locations[store_index].name, store_locations[store_index].item_category, store_locations[store_index].store_type_id);
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "There is no store nearby!");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
+        }
+    }
+
+    [Command("atm")]
+    public void atmFunc(Client player)
+    {
+        if (!API.isPlayerInAnyVehicle(player))
+        {
+            Vector3 plr_pos = API.getEntityPosition(player);
+            float smallest_dist = 100.0f;
+            int store_index = -1;
+            for (int i = 0; i < store_locations.Length; i++)
+            {
+                float currdist = vecdist(plr_pos, store_locations[i].location);
+
+                if (currdist < smallest_dist && store_locations[i].command == "atm")
+                {
+                    smallest_dist = currdist;
+                    store_index = i;
+                }
+            }
+
+            if (smallest_dist < 2.0f && store_index != -1)
+            {
+                API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
+                API.triggerClientEvent(player, "atm_list", store_locations[store_index].name, store_locations[store_index].item_category, store_locations[store_index].store_type_id);
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "There is no ATM nearby!");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
+        }
+    }
+
+    [Command("exitcef")]
+    public void exitCefFunc(Client player)
+    {
+        API.triggerClientEvent(player, "close_cef");
     }
 
     [Command("repair")]
@@ -2531,6 +2738,14 @@ public class server_core_remaster_2 : Script
         player_database[indx] = temp;
         API.sendChatMessageToPlayer(player, "Paycheck applied.");
     }
+
+    [Command("setskin", GreedyArg = true)]
+    public void setSkin(Client player, string msg)
+    {
+        API.setPlayerSkin(player, API.pedNameToModel(msg));
+    }
+
+
 }
 
 

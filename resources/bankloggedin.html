@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+    <head>
+		<script src="jquery.js"></script>
+		<script src="client_core_remaster.js"></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="main.css">
+		
+		<script type="text/javascript">
+            function ExitClick() {
+			resourceCall("exitBrowser");
+			}
+        </script>
+		
+		<script type="text/javascript">
+            function changeName(name, sum) {
+				//document.getElementById("testid").innerHTML = "hello";
+				test(event);
+			}
+        </script>
+		
+		<script>
+			function test(event)
+			{
+				document.getElementById("testid").innerHTML = "hello";
+				event.preventDefault();
+			}
+		</script>
+		
+    </head>
+    <body bgcolor="#ffffff">
+		<center><img src="mazebanklogo.png" alt="Maze Bank Logo"/>
+		<center><p id="testid">...loading...</p></center>
+		<br>
+		<center><h2 id="banksum">...fetching sum...</h2></center>
+		<br><br>
+		<br><br>
+		<input type="button" id="exitbutton" style="height:30px;width:130px;font-face: 'Comic Sans MS'; font-size:20px; font-weight:700; color:white; background-color:red; border:3pt ridge red" value="EXIT" onclick="ExitClick();"/>
+    </body>
+</html>
