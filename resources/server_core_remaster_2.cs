@@ -629,14 +629,14 @@ public class server_core_remaster_2 : Script
             for (int i = 0; i < player_database.Count; i++)
             {
                 PlayerData player_data = player_database[i];
-                player_data.player_online = false;
-                player_data.player_logged = false;
-                player_data.player_id = -1;
-                if(player_data.player_client != null)
+                if(player_data.player_client != null && player_data.player_logged)
                 {
                     player_data.player_position = API.getEntityPosition(player_data.player_client);
                     player_data.player_rotation = API.getEntityRotation(player_data.player_client);
                 }
+                player_data.player_online = false;
+                player_data.player_logged = false;
+                player_data.player_id = -1;
                 API.consoleOutput("_id -> " + player_data.Id.ToString() + " has been pushed into the database.");
                 var bsonObj = player_data.ToBsonDocument();
                 var filter = Builders<BsonDocument>.Filter.Eq(w => w["_id"], player_data.Id);
@@ -1025,13 +1025,16 @@ public class server_core_remaster_2 : Script
         API.deleteEntity(temp);
 
         PlayerData player_data = player_database[index];
+        if(player_data.player_logged)
+        {
+            player_data.player_position = API.getEntityPosition(player);
+            player_data.player_rotation = API.getEntityRotation(player);
+        }
         RandomIDPlayerPool.Add(player_data.player_id);
         player_data.player_id = -1;
         player_data.player_client = null;
         player_data.player_online = false;
         player_data.player_logged = false;
-        player_data.player_position = API.getEntityPosition(player);
-        player_data.player_rotation = API.getEntityRotation(player);
         player_database[index] = player_data;
 
         if (client.Cluster.Description.State.ToString() == "Disconnected")
