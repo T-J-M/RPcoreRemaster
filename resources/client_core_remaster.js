@@ -330,7 +330,17 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             API.sendChatMessage(args[1]);
             applyBankData(args[0], args[1]);
             break;
-           
+        case 'bring_phone':
+            exitBrowser();
+            API.sendChatMessage("cef_phone_call");
+            mainBrowser = API.createCefBrowser(200.0, 392.0, true);
+            API.waitUntilCefBrowserInit(mainBrowser);
+            API.sendChatMessage("RES Y: " + res.Height);
+            API.setCefBrowserPosition(mainBrowser, res.Width * (2/3) - (200.0), res.Height - (392.0));
+            API.loadPageCefBrowser(mainBrowser, "phonehtml.html");
+            API.showCursor(true);
+            API.sleep(100);
+            break;
     }
 });
 
@@ -486,4 +496,9 @@ function limitAmount(amount)
     if (amount !== "null" && amount !== null) {
         API.triggerServerEvent("limitThis", amount);
     }
+}
+
+function phoneTest()
+{
+    API.sendChatMessage("Hello! Phone!");
 }

@@ -8,8 +8,14 @@
   <file src="main.css" />
   <file src="bankpinlogin.html" />
   <file src="banklogin.html" />
+  <file src="phonehtml.html" />
   <file src="mazebanklogo.png" />
   <file src="mazebanklogo2.png" />
+  <file src="phonetest.png" />
+  <file src="phoneback.png" />
+  <file src="temp50x50.png" />
+  <file src="temp25x25.png" />
+  <file src="phonewall.png" />
   <assembly ref="System.XML.dll"/>
   <assembly ref="MongoDB.Bson.dll"/>
   <assembly ref="MongoDB.Driver.dll"/>

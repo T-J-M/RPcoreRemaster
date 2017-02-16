@@ -2994,7 +2994,11 @@ public class server_core_remaster_2 : Script
         API.setPlayerSkin(player, API.pedNameToModel(msg));
     }
 
-
+    [Command("phone")]
+    public void phoneFunc(Client player)
+    {
+        API.triggerClientEvent(player, "bring_phone");
+    }
 }
 
 
