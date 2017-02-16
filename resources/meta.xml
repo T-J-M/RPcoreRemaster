@@ -7,8 +7,9 @@
   <file src="jquery.js" />
   <file src="main.css" />
   <file src="bankpinlogin.html" />
+  <file src="banklogin.html" />
   <file src="mazebanklogo.png" />
-  
+  <file src="mazebanklogo2.png" />
   <assembly ref="System.XML.dll"/>
   <assembly ref="MongoDB.Bson.dll"/>
   <assembly ref="MongoDB.Driver.dll"/>

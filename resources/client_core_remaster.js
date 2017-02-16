@@ -280,13 +280,28 @@ API.onServerEventTrigger.connect(function (eventName, args) {
                 API.callNative('0xD4D4F6A4AB575A33', args[1], args[0], true);
             break;
         case 'atm_list':
+            exitBrowser();
             API.sendChatMessage("cef_atm_call");
-            mainBrowser = API.createCefBrowser(1000.0, 500.0, true);
+            mainBrowser = API.createCefBrowser(900.0, 500.0, true);
             API.waitUntilCefBrowserInit(mainBrowser);
             API.sendChatMessage("RES Y: " + res.Height);
-            API.setCefBrowserPosition(mainBrowser, res.Width / 2.0 - (1000.0) / 2.0, res.Height / 2.0 - (500.0) / 2.0);
+            API.setCefBrowserPosition(mainBrowser, res.Width / 2.0 - (900.0) / 2.0, res.Height / 2.0 - (500.0) / 2.0);
             API.loadPageCefBrowser(mainBrowser, "bankpinlogin.html");
             API.showCursor(true);
+
+            break;
+        case 'bank_list':
+            exitBrowser();
+            API.sendChatMessage("cef_bank_call");
+            mainBrowser = API.createCefBrowser(800.0, 575.0, true);
+            API.waitUntilCefBrowserInit(mainBrowser);
+            API.sendChatMessage("RES Y: " + res.Height);
+            API.setCefBrowserPosition(mainBrowser, res.Width / 2.0 - (800.0) / 2.0, res.Height / 2.0 - (575.0) / 2.0);
+            API.loadPageCefBrowser(mainBrowser, "banklogin.html");
+            API.showCursor(true);
+            API.sleep(100);
+            API.triggerServerEvent("getBankInfo");
+
             break;
         case 'close_cef':
             if (mainBrowser !== null)
@@ -305,6 +320,12 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             break;
         case 'pulled_bankdata':
             API.sendChatMessage("pulleddata");
+            API.sendChatMessage(args[0]);
+            API.sendChatMessage(args[1]);
+            applyBankData(args[0], args[1]);
+            break;
+        case 'update_sum':
+            API.sendChatMessage("updatedsum");
             API.sendChatMessage(args[0]);
             API.sendChatMessage(args[1]);
             applyBankData(args[0], args[1]);
@@ -428,7 +449,7 @@ function exitBrowser()
 {
     if (mainBrowser !== null)
         API.destroyCefBrowser(mainBrowser);
-    //mainBrowser = null;
+    mainBrowser = null;
     API.showCursor(false);
 }
 
@@ -441,8 +462,28 @@ function applyBankData(name, sum)
 {
     if (mainBrowser !== null)
     {
-        //API.waitUntilCefBrowserInit(mainBrowser);
         mainBrowser.call("changeName", name + "", sum + "");
     }
+}
 
+function depositAmount(amount)
+{
+    if (amount !== "null" && amount !== null)
+    {
+        API.triggerServerEvent("depositThis", amount);
+    }
+}
+
+function withdrawAmount(amount)
+{
+    if (amount !== "null" && amount !== null) {
+        API.triggerServerEvent("withdrawThis", amount);
+    }
+}
+
+function limitAmount(amount)
+{
+    if (amount !== "null" && amount !== null) {
+        API.triggerServerEvent("limitThis", amount);
+    }
 }

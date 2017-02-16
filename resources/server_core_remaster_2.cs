@@ -195,8 +195,8 @@ public class server_core_remaster_2 : Script
         new StoreData("shop", "Convenience Store \n/shop", "Item(s):", "seveneleven_2", new Vector3(-48.81896, -1756.122, 29.42099)),
         new StoreData("wash", "Car Wash \n/wash", "null", "carwash_1", new Vector3(50.31694, -1393.075, 29.00219)),
         new StoreData("fill", "Car Gas \n/fill", "null", "cargas_1", new Vector3(-71.19863, -1757.016, 29.03245)),
-        new StoreData("atm", "ATM \n/atm", "null", "atm_1", new Vector3(147.0421, -1034.716, 29.34404)),
-        new StoreData("bank", "Bank \n/bank", "null", "bank_1", new Vector3(149.6064, -1039.721, 29.37407)),
+        new StoreData("atm", "Fleeca ATM \n/atm", "null", "atm_1", new Vector3(147.0421, -1034.716, 29.34404)),
+        new StoreData("bank", "Fleeca Bank \n/bank", "null", "bank_1", new Vector3(149.6064, -1039.721, 29.37407)),
         new StoreData("use", "Public Phone \n/use", "null", "publicphone_1", new Vector3(187.5654, -1043.799, 29.33121)),
     };
 
@@ -372,6 +372,7 @@ public class server_core_remaster_2 : Script
         public int player_vehicles_owned { get; set; }
 
         public string bank_pin { get; set; }
+        public long max_atm_withdrawl { get; set;}
 
         public List<ObjectData> player_inventory { get; set; }
 
@@ -400,6 +401,7 @@ public class server_core_remaster_2 : Script
             this.player_vehicles_owned = 0;
             this.player_inventory = new List<ObjectData>();
             this.bank_pin = "1234";
+            this.max_atm_withdrawl = 100;
         }
 
         public PlayerData()
@@ -1048,6 +1050,13 @@ public class server_core_remaster_2 : Script
 
     public void OnChatMessageHandler(Client player, string message, CancelEventArgs e)
     {
+        int indx = getPlayerDatabaseIndexByClient(player);
+        string msgr = "(" + player_database[indx].player_id + ")" + player_database[indx].player_display_name + ": " + message;
+        var players = API.getPlayersInRadiusOfPlayer(30.0f, player);
+        foreach (Client c in players)
+        {
+            API.sendChatMessageToPlayer(c, msgr);
+        }
         e.Cancel = true;
     }
 
@@ -1205,6 +1214,77 @@ public class server_core_remaster_2 : Script
                 string mula = "$" + player_database[indx].player_money_bank.ToString("N0");
                 API.triggerClientEvent(player, "pulled_bankdata", name, mula);
             }
+        }
+        else if(eventName == "depositThis")
+        {
+            long amount = Convert.ToInt64(args[0]);
+            int indx = getPlayerDatabaseIndexByClient(player);
+            if (indx != -1)
+            {
+                if(amount <= 0)
+                {
+                    API.sendChatMessageToPlayer(player, "You cannot deposit a negative or zero amount!");
+                }
+                else if(player_database[indx].player_money_hand - amount < 0)
+                {
+                    API.sendChatMessageToPlayer(player, "You cannot deposit this amount!");
+                }
+                else
+                {
+                    API.sendChatMessageToPlayer(player, "You deposited ~b~$" + amount.ToString("N0"));
+                    player_database[indx].player_money_hand -= amount;
+                    player_database[indx].player_money_bank += amount;
+                    API.triggerClientEvent(player, "update_sum", player_database[indx].player_display_name, "$" + player_database[indx].player_money_bank.ToString("N0"));
+                }
+            }
+        }
+        else if(eventName == "withdrawThis")
+        {
+            long amount = Convert.ToInt64(args[0]);
+            int indx = getPlayerDatabaseIndexByClient(player);
+            if (indx != -1)
+            {
+                if (amount <= 0)
+                {
+                    API.sendChatMessageToPlayer(player, "You cannot withdraw a negative or zero amount!");
+                }
+                else if (player_database[indx].player_money_bank - amount < 0)
+                {
+                    API.sendChatMessageToPlayer(player, "You cannot withdraw this amount!");
+                }
+                else
+                {
+                    API.sendChatMessageToPlayer(player, "You withdrew ~b~$" + amount.ToString("N0"));
+                    player_database[indx].player_money_hand += amount;
+                    player_database[indx].player_money_bank -= amount;
+                    API.triggerClientEvent(player, "update_sum", player_database[indx].player_display_name, "$" + player_database[indx].player_money_bank.ToString("N0"));
+                }
+            }
+        }
+        else if(eventName == "limitThis")
+        {
+            long amount = Convert.ToInt64(args[0]);
+            int indx = getPlayerDatabaseIndexByClient(player);
+            if(indx != -1)
+            {
+                if(amount < 0)
+                {
+                    API.sendChatMessageToPlayer(player, "Cannot limit to a negative!");
+                }
+                else
+                {
+                    player_database[indx].max_atm_withdrawl = amount;
+                    API.sendChatMessageToPlayer(player, "ATM withdrawl limit set!");
+                }
+            }
+        }
+        else if(eventName == "getBankInfo")
+        {
+            int indx = getPlayerDatabaseIndexByClient(player);
+            if (indx != -1)
+                API.triggerClientEvent(player, "update_sum", player_database[indx].player_display_name, "$" + player_database[indx].player_money_bank.ToString("N0"));
+            else
+                API.sendChatMessageToPlayer(player, "WHY");
         }
     }
 
@@ -2665,12 +2745,178 @@ public class server_core_remaster_2 : Script
 
             if (smallest_dist < 2.0f && store_index != -1)
             {
+                int indx = getPlayerDatabaseIndexByClient(player);
+                if (indx != -1)
+                    API.sendChatMessageToPlayer(player, "Bank Sum: ~b~$" + player_database[indx].player_money_bank.ToString("N0"));
                 API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
                 API.triggerClientEvent(player, "atm_list", store_locations[store_index].name, store_locations[store_index].item_category, store_locations[store_index].store_type_id);
             }
             else
             {
                 API.sendChatMessageToPlayer(player, "There is no ATM nearby!");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
+        }
+    }
+
+    [Command("bank")]
+    public void bankFunc(Client player)
+    {
+        if (!API.isPlayerInAnyVehicle(player))
+        {
+            Vector3 plr_pos = API.getEntityPosition(player);
+            float smallest_dist = 100.0f;
+            int store_index = -1;
+            for (int i = 0; i < store_locations.Length; i++)
+            {
+                float currdist = vecdist(plr_pos, store_locations[i].location);
+
+                if (currdist < smallest_dist && store_locations[i].command == "bank")
+                {
+                    smallest_dist = currdist;
+                    store_index = i;
+                }
+            }
+
+            if (smallest_dist < 2.0f && store_index != -1)
+            {
+                //int indx = getPlayerDatabaseIndexByClient(player);
+                //if (indx != -1)
+                    //API.sendChatMessageToPlayer(player, "Bank Sum: ~b~$" + player_database[indx].player_money_bank.ToString("N0"));
+                API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
+                API.triggerClientEvent(player, "bank_list", store_locations[store_index].name, store_locations[store_index].item_category, store_locations[store_index].store_type_id);
+
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "There is no bank nearby!");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
+        }
+    }
+
+    [Command("withdraw", GreedyArg = true)]
+    public void withdrawFunc(Client player, string msg)
+    {
+        if (!API.isPlayerInAnyVehicle(player))
+        {
+            long amount = Convert.ToInt64(msg);
+            Vector3 plr_pos = API.getEntityPosition(player);
+            float smallest_dist = 100.0f;
+            int store_index = -1;
+            bool isatm = false;
+            for (int i = 0; i < store_locations.Length; i++)
+            {
+                float currdist = vecdist(plr_pos, store_locations[i].location);
+
+                if (currdist < smallest_dist && (store_locations[i].command == "bank" || store_locations[i].command == "atm"))
+                {
+                    if (store_locations[i].command == "bank")
+                        isatm = false;
+                    else
+                        isatm = true;
+                    smallest_dist = currdist;
+                    store_index = i;
+                }
+            }
+
+            if (smallest_dist < 2.0f && store_index != -1)
+            {
+                int indx = getPlayerDatabaseIndexByClient(player);
+                if (indx != -1)
+                {
+                    if (amount > player_database[indx].max_atm_withdrawl && isatm)
+                    {
+                        API.sendChatMessageToPlayer(player, "Maximum withdraw limit reached!");
+                    }
+                    else
+                    {
+                        if (player_database[indx].player_money_bank - amount >= 0)
+                        {
+                            player_database[indx].player_money_bank -= amount;
+                            player_database[indx].player_money_hand += amount;
+                            API.sendChatMessageToPlayer(player, "You withdrew ~b~$" + amount.ToString("N0"));
+                        }
+                        else
+                        {
+                            API.sendChatMessageToPlayer(player, "Your bank sum is too low!");
+                        }
+                    }
+                }
+                //API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
+               // API.triggerClientEvent(player, "atm_list", store_locations[store_index].name, store_locations[store_index].item_category, store_locations[store_index].store_type_id);
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "There is no bank/ATM nearby!");
+            }
+        }
+        else
+        {
+            API.sendChatMessageToPlayer(player, "You cannot do that in a vehicle!");
+        }
+    }
+
+    [Command("deposit", GreedyArg = true)]
+    public void depositFunc(Client player, string msg)
+    {
+        if (!API.isPlayerInAnyVehicle(player))
+        {
+            long amount = Convert.ToInt64(msg);
+            Vector3 plr_pos = API.getEntityPosition(player);
+            float smallest_dist = 100.0f;
+            int store_index = -1;
+            bool isatm = false;
+            for (int i = 0; i < store_locations.Length; i++)
+            {
+                float currdist = vecdist(plr_pos, store_locations[i].location);
+
+                if (currdist < smallest_dist && (store_locations[i].command == "bank" || store_locations[i].command == "atm"))
+                {
+                    if (store_locations[i].command == "bank")
+                        isatm = false;
+                    else
+                        isatm = true;
+                    smallest_dist = currdist;
+                    store_index = i;
+                }
+            }
+
+            if (smallest_dist < 2.0f && store_index != -1)
+            {
+                int indx = getPlayerDatabaseIndexByClient(player);
+                if (indx != -1)
+                {
+                    if (isatm)
+                    {
+                        API.sendChatMessageToPlayer(player, "You cannot deposit at an ATM. Visit a bank!");
+                    }
+                    else
+                    {
+                        if (player_database[indx].player_money_hand - amount >= 0)
+                        {
+                            player_database[indx].player_money_bank += amount;
+                            player_database[indx].player_money_hand -= amount;
+                            API.sendChatMessageToPlayer(player, "You deposited ~b~$" + amount.ToString("N0"));
+                        }
+                        else
+                        {
+                            API.sendChatMessageToPlayer(player, "Your money sum is too low!");
+                        }
+                    }
+                }
+                //API.sendChatMessageToPlayer(player, "store call type: " + store_locations[store_index].store_type_id);
+                // API.triggerClientEvent(player, "atm_list", store_locations[store_index].name, store_locations[store_index].item_category, store_locations[store_index].store_type_id);
+            }
+            else
+            {
+                API.sendChatMessageToPlayer(player, "There is no bank nearby!");
             }
         }
         else

@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+    <head>
+		<style>
+			#grad1 {
+				height: 100%;
+				background: linear-gradient(to bottom, red, white 20%, white 80%, red); /* Standard syntax (must be last) */
+			}
+		</style>
+		<script src="jquery.js"></script>
+		<script src="client_core_remaster.js"></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="main.css">
+		
+		<script type="text/javascript">
+            function DepositClick() {
+			var depositamnt = $("#depositbox").val();
+			if(depositamnt.length > 0)
+				resourceCall("depositAmount", depositamnt);
+			else
+				resourceCall("depositAmount", "null");
+			}
+        </script>
+		
+		<script type="text/javascript">
+            function WithdrawClick() {
+			var withdrawamnt = $("#withdrawbox").val();
+			if(withdrawamnt.length > 0)
+				resourceCall("withdrawAmount", withdrawamnt); //Send the Password to the client side API
+			else
+				resourceCall("withdrawAmount", "null");
+			}
+        </script>
+		
+		<script type="text/javascript">
+            function LimitClick() {
+			var limitamnt = $("#limitbox").val();
+			if(limitamnt.length > 0)
+				resourceCall("limitAmount", limitamnt); //Send the Password to the client side API
+			else
+				resourceCall("limitAmount", "null");
+			}
+        </script>
+		
+		<script type="text/javascript">
+            function ExitClick() {
+			resourceCall("exitBrowser");
+			}
+        </script>
+		
+		<script type="text/javascript">
+            function changeName(name, sum) {
+				document.getElementById("usernm").innerHTML = name;
+				document.getElementById("sumid").innerHTML = sum;
+				//resourceCall("loginBank");
+			}
+        </script>
+		
+    </head>
+    <body style="grad1">
+		<div id="grad1">
+		<center><img src="mazebanklogo2.png" alt="Maze Bank Logo"/><h1 id="usernm">...LOADING...</h1><h1 id="sumid"></h1>
+		<form>
+		<input type="number" name="depositbox" id="depositbox" size="7" style="font-size:25pt;height:50px;width:200px;text-align:center;"> 
+		<input type="number" name="withdrawbox" id="withdrawbox" size="7" style="font-size:25pt;height:50px;width:200px;text-align:center;">
+          <br>
+		</form>
+		<br><br>
+		<input type="button" id="depositbutton" style="height:50px;width:200px;font-face: 'Comic Sans MS'; font-size:30px; font-weight:700; color:white; background-color:red; border:3pt ridge red" value="DEPOSIT" onclick="DepositClick();"/> 
+          <input type="button" id="withdrawbutton" style="height:50px;width:200px;font-face: 'Comic Sans MS'; font-size:30px; font-weight:700; color:white; background-color:red; border:3pt ridge red" value="WITHDRAW" onclick="WithdrawClick();"/>
+		<br><br>
+		<input type="button" id="exitbutton" style="height:30px;width:130px;font-face: 'Comic Sans MS'; font-size:20px; font-weight:700; color:white; background-color:red; border:3pt ridge red" value="EXIT" onclick="ExitClick();"/>
+          
+          <br><br>
+          <form>
+		 <div style="text-align:right"><input type="number" name="limitbox" id="limitbox" size="7" style="font-size:15pt;height:35px;width:200px; "></div>
+          <br>
+		</form>
+          <div style="text-align:right"><input type="button" id="limitButton" style="height:30px;width:200px;font-face: 'Comic Sans MS'; font-size:20px; font-weight:700; color:white; background-color:red; border:3pt ridge red" value="Set Max Withdrawl" onclick="LimitClick();"/></div>
+        </div>
+	</body>
+</html>

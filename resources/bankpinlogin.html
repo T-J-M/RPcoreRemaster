@@ -1,6 +1,12 @@
 <!doctype html>
 <html>
     <head>
+		<style>
+			#grad1 {
+				height: 100%;
+				background: linear-gradient(to bottom, red, white 20%, white 80%, red); /* Standard syntax (must be last) */
+			}
+		</style>
 		<script src="jquery.js"></script>
 		<script src="client_core_remaster.js"></script>
         <meta charset="utf-8">
@@ -51,15 +57,17 @@
         </script>
 		
     </head>
-    <body bgcolor="#ffffff">
+    <body style="grad1">
+		<div id="grad1">
 		<center><img src="mazebanklogo.png" alt="Maze Bank Logo"/>
 		<center><h1 id="usernm">Enter your PIN#:</h1></center>
 		<form>
-		<center><input type="password" name="pin" id="pin" maxlength="4" size="4" style="font-size:51pt;height:50px;width:100px;"><br>
+		<center><input type="password" name="pin" id="pin" maxlength="4" size="4" style="font-size:51pt;height:50px;width:100px;text-align:center;"><br>
 		</form>
 		<br><br>
 		<input type="button" id="loginbutton" style="height:50px;width:180px;font-face: 'Comic Sans MS'; font-size:30px; font-weight:700; color:white; background-color:red; border:3pt ridge red" value="LOGIN" onclick="ButtonClick();"/>
 		<br><br>
 		<input type="button" id="exitbutton" style="height:30px;width:130px;font-face: 'Comic Sans MS'; font-size:20px; font-weight:700; color:white; background-color:red; border:3pt ridge red" value="EXIT" onclick="ExitClick();"/>
-    </body>
+		</div>
+	</body>
 </html>
