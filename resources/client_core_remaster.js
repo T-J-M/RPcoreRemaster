@@ -498,7 +498,7 @@ function limitAmount(amount)
     }
 }
 
-function phoneTest()
+function phoneTest(strn)
 {
-    API.sendChatMessage("Hello! Phone!");
+    API.sendChatMessage("phone_app_call: " + strn);
 }
