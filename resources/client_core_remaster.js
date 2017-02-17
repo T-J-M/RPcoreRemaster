@@ -352,6 +352,7 @@ var isClosing = true;
 
 var outofcontrol_called = false;
 var overridecontrol_called = false;
+var is_phone_on = false;
 
 API.onUpdate.connect(function () {
     API.drawMenu(anim_menu);
@@ -421,11 +422,30 @@ API.onKeyUp.connect(function (sender, e) {
             }
         }
     }
-    else if (e.KeyCode === Keys.M) {
+    if (e.KeyCode === Keys.M) {
         if (mainBrowser !== null)
             API.destroyCefBrowser(mainBrowser);
         mainBrowser = null;
         API.showCursor(false);
+    }
+    if(e.KeyCode === Keys.Up && is_phone_on === false)
+    {
+        is_phone_on = true;
+        exitBrowser();
+        API.sendChatMessage("cef_phone_call");
+        mainBrowser = API.createCefBrowser(200.0, 392.0, true);
+        API.waitUntilCefBrowserInit(mainBrowser);
+        API.sendChatMessage("RES Y: " + res.Height);
+        API.setCefBrowserPosition(mainBrowser, res.Width * (2 / 3) - (200.0), res.Height - (392.0));
+        API.loadPageCefBrowser(mainBrowser, "phonehtml.html");
+        API.showCursor(true);
+        API.sleep(100);
+    }
+    else if (e.KeyCode === Keys.Down && is_phone_on === true)
+    {
+        is_phone_on = false;
+        exitBrowser();
+        API.sleep(100);
     }
 });
 
@@ -498,7 +518,7 @@ function limitAmount(amount)
     }
 }
 
-function phoneTest(strn)
+function phoneEventHandler(strn)
 {
     API.sendChatMessage("phone_app_call: " + strn);
 }
