@@ -9,8 +9,6 @@ img {
   position: absolute;
   top: 0%;
   left: 0%;
-  animation: move 0.75s normal;
-  animation-timing-function: ease-in-out;
 }
 .phoneBackground {
   z-index: 1;
@@ -130,13 +128,34 @@ img {
   animation-timing-function: ease-in-out;
 }
 
-@keyframes move {
+@keyframes moveup {
   from {
     transform: translateY(1000px);
   }
   to {
     transform: translateY(0px);
   }
+}
+.moveupanim
+{
+	position: absolute;
+	animation: moveup 0.75s normal;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes movedown {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(1000px);
+  }
+}
+.movedownanim
+{
+	position: absolute;
+	animation: movedown 0.75s normal;
+	animation-timing-function: ease-in-out;
 }
 
 
