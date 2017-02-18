@@ -453,6 +453,7 @@ API.onKeyUp.connect(function (sender, e) {
         is_phone_on = false;
         if (mainBrowser !== null)
             mainBrowser.call("ClosePhone");
+        API.showCursor(false);
         API.sleep(750);
         exitBrowser();
         API.sleep(100);

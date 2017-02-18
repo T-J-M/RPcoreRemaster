@@ -149,10 +149,15 @@ img {
   z-index: 1;
   position: absolute;
   color: white;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
-  left: 75px;
+  left: 140px;
   top: 20px;
+  text-shadow:
+     -1px -1px 3px #000,  
+      1px -1px 3px #000,
+      -1px 1px 3px #000,
+       1px 1px 3px #000;
 }
 
 @keyframes moveup {
