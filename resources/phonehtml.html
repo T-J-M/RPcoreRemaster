@@ -20,6 +20,14 @@
         </script>
 		
 		<script type="text/javascript">
+			function updateTime(strn)
+			{
+				var element = document.getElementById("timetxt");
+				element.innerHTML = strn;
+			}
+		</script>
+		
+		<script type="text/javascript">
             function ClosePhone() {
 			var element = document.getElementById("phone");
 			element.classList.remove("moveupanim");
@@ -47,7 +55,7 @@
 			<img class="iconTest12" src="temp50x50.png" onclick="PhoneEventCall('App12');">
 			<img class="backTest" src="temp25x25.png" onclick="PhoneEventCall('BackButton');">
 			<img class="homeTest" src="temp25x25.png" onclick="PhoneEventCall('HomeButton');">>
-			<p id="text">HH:MM:SS</p>
+			<p id="timetxt">HH:MM:SS</p>
 		</div>
     </body>
 </html>

@@ -19,104 +19,133 @@ img {
   z-index: 1;
 }
 .iconTest1 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 50px;
   left: 15px;
   z-index: 2;
 }
-
+.iconTest1:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest2 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 50px;
   left: 75px;
   z-index: 2;
 }
-
+.iconTest2:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest3 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 50px;
   left: 135px;
   z-index: 2;
 }
-
+.iconTest3:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest4 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 125px;
   left: 15px;
   z-index: 2;
 }
-
+.iconTest4:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest5 {
-  box-shadow: 0px 0px 5px #000000;
+ box-shadow: 0px 0px 5px 2px #000000;
   top: 125px;
   left: 75px;
   z-index: 2;
 }
-
+.iconTest5:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest6 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 125px;
   left: 135px;
   z-index: 2;
 }
-
+.iconTest6:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest7 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 200px;
   left: 15px;
   z-index: 2;
 }
-
+.iconTest7:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest8 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 200px;
   left: 75px;
   z-index: 2;
 }
-
+.iconTest8:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest9 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 200px;
   left: 135px;
   z-index: 2;
 }
-
+.iconTest9:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest10 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 275px;
   left: 15px;
   z-index: 2;
 }
-
+.iconTest10:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest11 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 275px;
   left: 75px;
   z-index: 2;
 }
-
+.iconTest11:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest12 {
-  box-shadow: 0px 0px 5px #000000;
+  box-shadow: 0px 0px 5px 2px #000000;
   top: 275px;
   left: 135px;
   z-index: 2;
 }
-
+.iconTest12:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .backTest {
-  box-shadow: 0px 0px 5px #000000;
-  top: 328px;
-  left: 27.5px;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 333px;
+  left: 32px;
   z-index: 2;
 }
-
+.backTest:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .homeTest {
-  box-shadow: 0px 0px 5px #000000;
-  top: 328px;
-  left: 87.5px;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 333px;
+  left: 90px;
   z-index: 2;
 }
+.homeTest:hover{
+  box-shadow: 0px 0px 5px 2px #36FF00;
+}
 
-#text {
+#timetxt {
   z-index: 1;
   position: absolute;
   color: white;
@@ -124,8 +153,6 @@ img {
   font-weight: bold;
   left: 75px;
   top: 20px;
-  animation: move 0.75s normal;
-  animation-timing-function: ease-in-out;
 }
 
 @keyframes moveup {
@@ -139,7 +166,7 @@ img {
 .moveupanim
 {
 	position: absolute;
-	animation: moveup 0.75s normal;
+	animation: moveup 0.75s linear forwards;
 	animation-timing-function: ease-in-out;
 }
 
@@ -154,7 +181,7 @@ img {
 .movedownanim
 {
 	position: absolute;
-	animation: movedown 0.75s normal;
+	animation: movedown 0.75s linear forwards;
 	animation-timing-function: ease-in-out;
 }
 

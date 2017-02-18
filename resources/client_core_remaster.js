@@ -361,6 +361,13 @@ API.onUpdate.connect(function () {
     API.drawMenu(confirm_menu);
     API.drawMenu(showroom_menu);
 
+    if (is_phone_on && mainBrowser !== null)
+    {
+        //var str = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+        var d = new Date();
+        mainBrowser.call("updateTime", pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) + "");
+    }
+
     if (API.isPlayerInAnyVehicle(API.getLocalPlayer()) === true) {
         var is_onroof_stuck = API.returnNative("IS_VEHICLE_STUCK_ON_ROOF", 8, API.getPlayerVehicle(API.getLocalPlayer()));
         var is_veh_allwheels = API.returnNative("IS_VEHICLE_ON_ALL_WHEELS", 8, API.getPlayerVehicle(API.getLocalPlayer()));
@@ -438,7 +445,7 @@ API.onKeyUp.connect(function (sender, e) {
         API.sendChatMessage("RES Y: " + res.Height);
         API.setCefBrowserPosition(mainBrowser, res.Width * (2 / 3) - (200.0), res.Height - (392.0));
         API.loadPageCefBrowser(mainBrowser, "phonehtml.html");
-        //API.showCursor(true);
+        API.showCursor(true);
         API.sleep(100);
     }
     else if (e.KeyCode === Keys.Down && is_phone_on === true)
@@ -471,6 +478,10 @@ API.onKeyDown.connect(function (sender, e) {
         }
     }
 });
+
+function pad(d) {
+    return (d < 10) ? '0' + d.toString() : d.toString();
+}
 
 function checkPinNumber(val)
 {
