@@ -33,15 +33,51 @@
 			element.classList.remove("moveupanim");
 			void element.offsetWidth;
 			element.classList.add("movedownanim");
+			
+			element = document.getElementById("mandatory");
+			element.classList.remove("moveupanim");
+			void element.offsetWidth;
+			element.classList.add("movedownanim");
+			
+			element = document.getElementById("appload1");
+			element.classList.remove("moveinanim");
+			void element.offsetWidth;
+			element.classList.add("movedownanim");
 			}
         </script>
 		
+		<script type="text/javascript">
+			function App1()
+			{
+				var element = document.getElementById("appload1");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function HomeButton()
+			{
+				var element = document.getElementById("appload1");
+				element.classList.remove("moveinanim");
+				void element.offsetWidth;
+				element.classList.add("moveoutanim");
+			}
+		</script>
+		
     </head>
     <body>
-		<div id="phone" class="moveupanim">
+		<div id="mandatory" class="moveupanim" style="z-index:99;">
+			<img class="backTest" src="temp25x25.png" onclick="PhoneEventCall('BackButton');">
+			<img class="homeTest" src="temp25x25.png" onclick="HomeButton();">>
+			<p id="timetxt">HH:MM:SS</p>
+		</div>
+		
+		<div id="phone" class="moveupanim" style="z-index:1;">
 			<img class="phoneBackground" src="phoneback.png">
 			<img class="phoneWallpaper" src="phonewall.png">
-			<img class="iconTest1" src="temp50x50.png" onclick="PhoneEventCall('App1');">
+			<img class="iconTest1" src="temp50x50.png" onclick="App1();">
 			<img class="iconTest2" src="temp50x50.png" onclick="PhoneEventCall('App2');">
 			<img class="iconTest3" src="temp50x50.png" onclick="PhoneEventCall('App3');">
 			<img class="iconTest4" src="temp50x50.png" onclick="PhoneEventCall('App4');">
@@ -53,9 +89,10 @@
 			<img class="iconTest10" src="temp50x50.png" onclick="PhoneEventCall('App10');">
 			<img class="iconTest11" src="temp50x50.png" onclick="PhoneEventCall('App11');">
 			<img class="iconTest12" src="temp50x50.png" onclick="PhoneEventCall('App12');">
-			<img class="backTest" src="temp25x25.png" onclick="PhoneEventCall('BackButton');">
-			<img class="homeTest" src="temp25x25.png" onclick="PhoneEventCall('HomeButton');">>
-			<p id="timetxt">HH:MM:SS</p>
+		</div>
+		
+		<div id="appload1" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+			<img class="appload1test" src="phonewall2.png">
 		</div>
     </body>
 </html>
