@@ -17,6 +17,13 @@
   <file src="temp25x25.png" />
   <file src="phonewall.png" />
   <file src="phonewall2.png" />
+  <file src="phoneicon.png" />
+  <file src="smsicon.png" />
+  <file src="timeicon.png" />
+  <file src="weathericon.png" />
+  <file src="bankicon.png" />
+  <file src="cameraicon.png" />
+  <file src="noteicon.png" />
   <assembly ref="System.XML.dll"/>
   <assembly ref="MongoDB.Bson.dll"/>
   <assembly ref="MongoDB.Driver.dll"/>

@@ -41,6 +41,9 @@ public class server_core_remaster_2 : Script
     //Used for rng
     public static Random rnd = new Random();
 
+    //Initialisation of server
+    public bool is_server_done_loading = false;
+
     public server_core_remaster_2()
     {
         //Handlers
@@ -51,6 +54,7 @@ public class server_core_remaster_2 : Script
         API.onChatMessage += OnChatMessageHandler;
         API.onChatCommand += OnChatCommandHandler;
         API.onPlayerDisconnected += OnPlayerDisconnectedHandler;
+        API.onPlayerBeginConnect += OnPlayerBeginConnectHandler;
         Blip dealership_1_blip = API.createBlip(new Vector3(-61.70732, -1093.239, 26.4819));
         API.setBlipSprite(dealership_1_blip, 380);
         API.setBlipColor(dealership_1_blip, 47);
@@ -596,6 +600,7 @@ public class server_core_remaster_2 : Script
                         //API.consoleOutput("BSON OBJ: " + document["player_display_name"].ToString());
                         API.consoleOutput("Found vehicle: " + obj.car_model_name + " -> " + obj.Id.ToString());
                         spawnExistingCar(ref obj);
+                        API.sleep(100);
                         vehicle_database.Add(obj);
                     }
                 }
@@ -609,6 +614,7 @@ public class server_core_remaster_2 : Script
         API.removeIpl("fakeint"); //Remove the fake Deluxe Motorsport interior  
         //API.requestIpl("v_carshowroom");
         API.consoleOutput("Server_Core has initialised.");
+        is_server_done_loading = true;
     }
 
     //Server shutdown
@@ -666,6 +672,14 @@ public class server_core_remaster_2 : Script
 
         API.consoleOutput("Server_Core has terminated.");
         API.sleep(2000);
+    }
+    
+    public void OnPlayerBeginConnectHandler(Client player, CancelEventArgs e)
+    {
+        if(!is_server_done_loading)
+        {
+            e.Cancel = true;
+        }
     }
 
     //Utilities
