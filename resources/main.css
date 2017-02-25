@@ -17,6 +17,17 @@ body {
   top: 30px;
   left: 8px;
 }
+
+.contact1{
+	position: absolute;
+	box-shadow: 0px 0px 5px 2px #000000;
+	top: 20px;
+	left: 7px;
+	z-index: 2;
+}
+.contact1:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest1 {
   position: absolute;
   box-shadow: 0px 0px 5px 2px #000000;
@@ -26,6 +37,16 @@ body {
 }
 .iconTest1:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
+}
+.contact2{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 20px;
+  left: 67px;
+  z-index: 2;
+}
+.contact2:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
 }
 .iconTest2 {
   position: absolute;
@@ -37,6 +58,16 @@ body {
 .iconTest2:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
 }
+.contact3{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 20px;
+  left: 127px;
+  z-index: 2;
+}
+.contact3:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest3 {
   position: absolute;
   box-shadow: 0px 0px 5px 2px #000000;
@@ -46,6 +77,16 @@ body {
 }
 .iconTest3:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
+}
+.contact4{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 95px;
+  left: 7px;
+  z-index: 2;
+}
+.contact4:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
 }
 .iconTest4 {
   position: absolute;
@@ -57,6 +98,16 @@ body {
 .iconTest4:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
 }
+.contact5{
+  position: absolute;
+ box-shadow: 0px 0px 5px 2px #000000;
+  top: 95px;
+  left: 67px;
+  z-index: 2;
+}
+.contact5:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest5 {
   position: absolute;
  box-shadow: 0px 0px 5px 2px #000000;
@@ -66,6 +117,16 @@ body {
 }
 .iconTest5:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
+}
+.contact6{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 95px;
+  left: 127px;
+  z-index: 2;
+}
+.contact6:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
 }
 .iconTest6 {
   position: absolute;
@@ -77,6 +138,16 @@ body {
 .iconTest6:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
 }
+.contact7{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 170px;
+  left: 7px;
+  z-index: 2;
+}
+.contact7:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest7 {
   position: absolute;
   box-shadow: 0px 0px 5px 2px #000000;
@@ -86,6 +157,16 @@ body {
 }
 .iconTest7:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
+}
+.contact8{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 170px;
+  left: 67px;
+  z-index: 2;
+}
+.contact8:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
 }
 .iconTest8 {
   position: absolute;
@@ -97,6 +178,16 @@ body {
 .iconTest8:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
 }
+.contact9{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 170px;
+  left: 127px;
+  z-index: 2;
+}
+.contact9:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest9 {
   position: absolute;
   box-shadow: 0px 0px 5px 2px #000000;
@@ -106,6 +197,16 @@ body {
 }
 .iconTest9:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
+}
+.contact10{
+position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 245px;
+  left: 7px;
+  z-index: 2;
+}
+.contact10:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
 }
 .iconTest10 {
   position: absolute;
@@ -117,6 +218,16 @@ body {
 .iconTest10:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
 }
+.contact11{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 245px;
+  left: 67px;
+  z-index: 2;
+}
+.contact11:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
+}
 .iconTest11 {
   position: absolute;
   box-shadow: 0px 0px 5px 2px #000000;
@@ -126,6 +237,16 @@ body {
 }
 .iconTest11:hover{
   box-shadow: 0px 0px 5px 2px #36FF00;
+}
+.contact12{
+  position: absolute;
+  box-shadow: 0px 0px 5px 2px #000000;
+  top: 245px;
+  left: 127px;
+  z-index: 2;
+}
+.contact12:hover{
+	box-shadow: 0px 0px 5px 2px #36FF00;
 }
 .iconTest12 {
   position: absolute;
@@ -165,49 +286,20 @@ body {
   box-shadow: 0px 0px 5px 2px #36FF00;
 }
 
-.appload1{
+#appcontainer{
+	width: 100%;
+	height: 100%;
+	top: 30px;
+	left: 8px;
+	position: absolute;
+}
+#appload1,
+#appload2,
+#appload3,
+#appload4{
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	transform-origin: 50% 100%;
-}
-.appload1test{
-	position: relative;
-	top: 30px;
-	left: 8px;
-}
-.appload2{
-	position: relative;
-	top: 0px;
-	left: 0px;
-	transform-origin: 50% 100%;
-}
-.appload2test{
-	position: relative;
-	top: 30px;
-	left: 8px;
-}
-.appload3{
-	position: relative;
-	top: 0px;
-	left: 0px;
-	transform-origin: 50% 100%;
-}
-.appload3test{
-	position: relative;
-	top: 30px;
-	left: 8px;
-}
-.appload4{
-	position: relative;
-	top: 0px;
-	left: 0px;
-	transform-origin: 50% 100%;
-}
-.appload4test{
-	position: relative;
-	top: 30px;
-	left: 8px;
 }
 
 .phonebody{

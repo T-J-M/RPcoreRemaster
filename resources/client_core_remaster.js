@@ -445,7 +445,7 @@ API.onKeyUp.connect(function (sender, e) {
         API.setCefBrowserPosition(mainBrowser, res.Width * (2 / 3) - (200.0), res.Height - (392.0));
         API.loadPageCefBrowser(mainBrowser, "phonehtml.html");
         API.showCursor(true);
-        API.sleep(500);
+        API.sleep(100);
     }
     else if (e.KeyCode === Keys.Down && is_phone_on === true)
     {

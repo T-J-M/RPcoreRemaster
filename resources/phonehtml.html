@@ -9,12 +9,12 @@
 		
     </head>
     <body>
-		<div id="mandatory" class="moveupanim" style="z-index:4; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+		<div id="mandatory" class="moveupanim" style="z-index:998; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
 			<img class="backTest" src="temp25x25.png" onclick="PhoneEventCall('BackButton');">
 			<img class="homeTest" src="temp25x25.png" onclick="HomeButton();">
 			<p id="timetxt">HH:MM:SS</p>
 		</div>
-		<div id="phonebody" class="moveupanim" style="z-index:5;">
+		<div id="phonebody" class="moveupanim" style="z-index:999;">
 			<img class="phoneBackground" src="phoneback.png">
 		</div>
 		<div id="phone" class="moveupanim" style="z-index:1; transform:scale(0.0,0.0) animation-fill-mode:forwards;">
@@ -33,20 +33,34 @@
 			<img class="iconTest12" src="temp50x50.png" onclick="PhoneEventCall('App12');">
 		</div>
 		
-		<div id="appload1" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
-			<img class="appload1test" src="phonewall2.png">
-		</div>
-		
-		<div id="appload2" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
-			<img class="appload2test" src="phonewall2.png">
-		</div>
-		
-		<div id="appload3" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
-			<img class="appload3test" src="phonewall2.png">
-		</div>
-		
-		<div id="appload4" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
-			<img class="appload4test" src="phonewall2.png">
+		<div id="appcontainer">
+			<div id="appload1" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload1test" src="phonewallblank.png">
+				<img class="contact1" src="contacticon.png" onclick="PhoneEventCall('Contact1');">
+				<img class="contact2" src="contacticon.png" onclick="PhoneEventCall('Contact2');">
+				<img class="contact3" src="contacticon.png" onclick="PhoneEventCall('Contact3');">
+				<img class="contact4" src="contacticon.png" onclick="PhoneEventCall('Contact4');">
+				<img class="contact5" src="contacticon.png" onclick="PhoneEventCall('Contact5');">
+				<img class="contact6" src="contacticon.png" onclick="PhoneEventCall('Contact6');">
+				<img class="contact7" src="contacticon.png" onclick="PhoneEventCall('Contact7');">
+				<img class="contact8" src="contacticon.png" onclick="PhoneEventCall('Contact8');">
+				<img class="contact9" src="contacticon.png" onclick="PhoneEventCall('Contact9');">
+				<img class="contact10" src="contacticon.png" onclick="PhoneEventCall('Contact10');">
+				<img class="contact11" src="contacticon.png" onclick="PhoneEventCall('Contact11');">
+				<img class="contact12" src="contacticon.png" onclick="PhoneEventCall('Contact12');">
+			</div>
+			
+			<div id="appload2" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload2test" src="phonewall2.png">
+			</div>
+			
+			<div id="appload3" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload3test" src="phonewall2.png">
+			</div>
+			
+			<div id="appload4" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload4test" src="phonewall2.png">
+			</div>
 		</div>
 		
 		<script type="text/javascript">

@@ -55,6 +55,7 @@ public class server_core_remaster_2 : Script
         API.onChatCommand += OnChatCommandHandler;
         API.onPlayerDisconnected += OnPlayerDisconnectedHandler;
         API.onPlayerBeginConnect += OnPlayerBeginConnectHandler;
+
         Blip dealership_1_blip = API.createBlip(new Vector3(-61.70732, -1093.239, 26.4819));
         API.setBlipSprite(dealership_1_blip, 380);
         API.setBlipColor(dealership_1_blip, 47);
