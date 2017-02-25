@@ -176,6 +176,39 @@ body {
 	top: 30px;
 	left: 8px;
 }
+.appload2{
+	position: relative;
+	top: 0px;
+	left: 0px;
+	transform-origin: 50% 100%;
+}
+.appload2test{
+	position: relative;
+	top: 30px;
+	left: 8px;
+}
+.appload3{
+	position: relative;
+	top: 0px;
+	left: 0px;
+	transform-origin: 50% 100%;
+}
+.appload3test{
+	position: relative;
+	top: 30px;
+	left: 8px;
+}
+.appload4{
+	position: relative;
+	top: 0px;
+	left: 0px;
+	transform-origin: 50% 100%;
+}
+.appload4test{
+	position: relative;
+	top: 30px;
+	left: 8px;
+}
 
 .phonebody{
 	position: absolute;
@@ -282,14 +315,3 @@ body {
 	animation: openscreen 0.25s linear forwards;
 	animation-timing-function: ease-in-out;
 }
-
-
-
-
-
-
-
-
-
-
-

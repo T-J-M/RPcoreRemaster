@@ -360,7 +360,6 @@ API.onUpdate.connect(function () {
     API.drawMenu(catalog_menu);
     API.drawMenu(confirm_menu);
     API.drawMenu(showroom_menu);
-
     if (is_phone_on && mainBrowser !== null)
     {
         //var str = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
@@ -446,7 +445,7 @@ API.onKeyUp.connect(function (sender, e) {
         API.setCefBrowserPosition(mainBrowser, res.Width * (2 / 3) - (200.0), res.Height - (392.0));
         API.loadPageCefBrowser(mainBrowser, "phonehtml.html");
         API.showCursor(true);
-        API.sleep(100);
+        API.sleep(500);
     }
     else if (e.KeyCode === Keys.Down && is_phone_on === true)
     {

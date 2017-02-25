@@ -11,7 +11,7 @@
     <body>
 		<div id="mandatory" class="moveupanim" style="z-index:4; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
 			<img class="backTest" src="temp25x25.png" onclick="PhoneEventCall('BackButton');">
-			<img class="homeTest" src="temp25x25.png" onclick="HomeButton();">>
+			<img class="homeTest" src="temp25x25.png" onclick="HomeButton();">
 			<p id="timetxt">HH:MM:SS</p>
 		</div>
 		<div id="phonebody" class="moveupanim" style="z-index:5;">
@@ -20,13 +20,13 @@
 		<div id="phone" class="moveupanim" style="z-index:1; transform:scale(0.0,0.0) animation-fill-mode:forwards;">
 			<img class="phoneWallpaper" src="phonewall.png">
 			<img class="iconTest1" src="phoneicon.png" onclick="App1();">
-			<img class="iconTest2" src="smsicon.png" onclick="PhoneEventCall('App2');">
-			<img class="iconTest3" src="bankicon.png" onclick="PhoneEventCall('App3');">
-			<img class="iconTest4" src="timeicon.png" onclick="PhoneEventCall('App4');">
+			<img class="iconTest2" src="smsicon.png" onclick="App2();">
+			<img class="iconTest3" src="bankicon.png" onclick="App3();">
+			<img class="iconTest4" src="timeicon.png" onclick="App4();">
 			<img class="iconTest5" src="weathericon.png" onclick="PhoneEventCall('App5');">
 			<img class="iconTest6" src="noteicon.png" onclick="PhoneEventCall('App6');">
 			<img class="iconTest7" src="cameraicon.png" onclick="PhoneEventCall('App7');">
-			<img class="iconTest8" src="temp50x50.png" onclick="PhoneEventCall('App8');">
+			<img class="iconTest8" src="settingsicon.png" onclick="PhoneEventCall('App8');">
 			<img class="iconTest9" src="temp50x50.png" onclick="PhoneEventCall('App9');">
 			<img class="iconTest10" src="temp50x50.png" onclick="PhoneEventCall('App10');">
 			<img class="iconTest11" src="temp50x50.png" onclick="PhoneEventCall('App11');">
@@ -35,6 +35,18 @@
 		
 		<div id="appload1" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
 			<img class="appload1test" src="phonewall2.png">
+		</div>
+		
+		<div id="appload2" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+			<img class="appload2test" src="phonewall2.png">
+		</div>
+		
+		<div id="appload3" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+			<img class="appload3test" src="phonewall2.png">
+		</div>
+		
+		<div id="appload4" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+			<img class="appload4test" src="phonewall2.png">
 		</div>
 		
 		<script type="text/javascript">
@@ -57,14 +69,16 @@
 		</script>
 		
 		<script type="text/javascript">
-            function ExitClick() {
-			resourceCall("exitBrowser");
+            function ExitClick() 
+			{
+				resourceCall("exitBrowser");
 			}
         </script>
 		
 		<script type="text/javascript">
-            function PhoneEventCall(strng) {
-			resourceCall("phoneEventHandler", strng);
+            function PhoneEventCall(strng) 
+			{
+				resourceCall("phoneEventHandler", strng);
 			}
         </script>
 		
@@ -77,29 +91,57 @@
 		</script>
 		
 		<script type="text/javascript">
-            function ClosePhone() {
-			var element = document.getElementById("phone");
-			element.classList.remove("openscreenanim");
-			element.classList.remove("moveupanim");
-			void element.offsetWidth;
-			element.classList.add("movedownanim");
-			
-			element = document.getElementById("phonebody");
-			element.classList.remove("moveupanim");
-			void element.offsetWidth;
-			element.classList.add("movedownanim");
-			
-			element = document.getElementById("mandatory");
-			element.classList.remove("openscreenanim");
-			element.classList.remove("moveupanim");
-			void element.offsetWidth;
-			element.classList.add("movedownanim");
-			
-			element = document.getElementById("appload1");
-			if($("#appload1").hasClass("moveinanim")){
-				element.classList.remove("moveinanim");
+            function ClosePhone() 
+			{
+				var element = document.getElementById("phone");
+				element.classList.remove("openscreenanim");
+				element.classList.remove("moveupanim");
 				void element.offsetWidth;
 				element.classList.add("movedownanim");
+				
+				element = document.getElementById("phonebody");
+				element.classList.remove("moveupanim");
+				void element.offsetWidth;
+				element.classList.add("movedownanim");
+				
+				element = document.getElementById("mandatory");
+				element.classList.remove("openscreenanim");
+				element.classList.remove("moveupanim");
+				void element.offsetWidth;
+				element.classList.add("movedownanim");
+				
+				element = document.getElementById("appload1");
+				if($("#appload1").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+					
+				}
+				
+				element = document.getElementById("appload2");
+				if($("#appload2").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+					
+				}
+					
+				element = document.getElementById("appload3");
+				if($("#appload3").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
+				
+				element = document.getElementById("appload4");
+				if($("#appload4").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
 				}
 			}
         </script>
@@ -112,7 +154,40 @@
 				element.classList.remove("moveoutanim");
 				void element.offsetWidth;
 				element.classList.add("moveinanim");
-				
+			}
+
+		</script>
+		
+		<script type="text/javascript">
+			function App2()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload2");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App3()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload3");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App4()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload4");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
 			}
 		</script>
 		
@@ -122,6 +197,30 @@
 				$("#phone").css("pointer-events", "auto");
 				var element = document.getElementById("appload1");
 				if($("#appload1").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload2");
+				if($("#appload2").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload3");
+				if($("#appload3").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload4");
+				if($("#appload4").hasClass("moveinanim"))
 				{
 					element.classList.remove("moveinanim");
 					void element.offsetWidth;
