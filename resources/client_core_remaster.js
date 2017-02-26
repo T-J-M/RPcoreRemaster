@@ -12,7 +12,7 @@ showroom_menu.ResetKey(menuControl.Back);
 
 anim_menu.AddItem(API.createMenuItem("Sitting", "Name(s): sit."));
 anim_menu.AddItem(API.createMenuItem("Standing", "Name(s): clean, clipboard1, clipboard2."));
-anim_menu.AddItem(API.createMenuItem("Phone", "Name(s): phone1, phone2, phone3."));
+anim_menu.AddItem(API.createMenuItem("Phone", "Name(s): phone1, phone2, phone3, phone4."));
 anim_menu.AddItem(API.createMenuItem("Ground", "Name(s): checkbody1, checkbody2."));
 anim_menu.AddItem(API.createMenuItem("Leaning", "Name(s): lean, leanfoot, leancar."));
 anim_menu.AddItem(API.createMenuItem("Surrender", "Name(s): handsup, handsupknees."));
@@ -187,6 +187,7 @@ anim_menu.OnItemSelect.connect(function (sender, item, index) {
             anim_sub_menu.AddItem(API.createMenuItem("phone1", "Animation"));
             anim_sub_menu.AddItem(API.createMenuItem("phone2", "Animation"));
             anim_sub_menu.AddItem(API.createMenuItem("phone3", "Animation"));
+            anim_sub_menu.AddItem(API.createMenuItem("phone4", "Animation"));
         }
         else if (item.Text === "Ground") {
             anim_sub_menu.AddItem(API.createMenuItem("checkbody1", "Animation"));
@@ -342,6 +343,7 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             API.loadPageCefBrowser(mainBrowser, "phonehtml.html");
             API.showCursor(true);
             API.sleep(100);
+            API.triggerServerEvent("play_phone_anim");
             break;
     }
 });
@@ -449,6 +451,7 @@ API.onKeyUp.connect(function (sender, e) {
         API.loadPageCefBrowser(mainBrowser, "phonehtml.html");
         API.showCursor(true);
         API.sleep(100);
+        API.triggerServerEvent("play_phone_anim");
     }
     else if (e.KeyCode === Keys.Down && is_phone_on === true)
     {
@@ -456,6 +459,7 @@ API.onKeyUp.connect(function (sender, e) {
         if (mainBrowser !== null)
             mainBrowser.call("ClosePhone");
         API.showCursor(false);
+        API.triggerServerEvent("stop_phone_anim");
         API.sleep(750);
         exitBrowser();
         API.sleep(100);
