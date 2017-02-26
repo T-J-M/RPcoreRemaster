@@ -39,6 +39,8 @@ dealership_cars.push({ name: "Grotti Carbonizzare", price: 235000, dealership: "
 dealership_cars.push({ name: "Obey 9F", price: 195000, dealership: "dealership_1", veh_name: "ninef" });
 dealership_cars.push({ name: "Benefactor Dubsta", price: 110000, dealership: "dealership_1", veh_name: "dubsta" });
 
+API.callNative("0x9304881D6F6537EA", 21);
+
 var text_labels = [];
 
 function formatNumber(num) {
@@ -360,6 +362,7 @@ API.onUpdate.connect(function () {
     API.drawMenu(catalog_menu);
     API.drawMenu(confirm_menu);
     API.drawMenu(showroom_menu);
+
     if (is_phone_on && mainBrowser !== null)
     {
         //var str = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();

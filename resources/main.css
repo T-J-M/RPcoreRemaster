@@ -296,7 +296,15 @@ position: absolute;
 #appload1,
 #appload2,
 #appload3,
-#appload4{
+#appload4,
+#appload5,
+#appload6,
+#appload7,
+#appload8,
+#appload9,
+#appload10,
+#appload11,
+#appload12{
 	position: absolute;
 	top: 0px;
 	left: 0px;

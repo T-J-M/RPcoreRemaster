@@ -1401,6 +1401,10 @@ public class server_core_remaster_2 : Script
                 API.triggerClientEvent(player, "create_label", store_locations[i].name, store_locations[i].location, store_locations[i].store_type_id);
             }
 
+            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_STATE_OF_CLOSEST_DOOR_OF_TYPE, -1148826190, 82.38156, -1390.476, 29.52609, false, 1.0, 0);
+            API.sendNativeToPlayer(player, GTANetworkServer.Hash.SET_STATE_OF_CLOSEST_DOOR_OF_TYPE, 868499217, 82.38156, -1390.752, 29.52609, false, 1.0, 0);
+
+            //API.sendNativeToAllPlayers(GTANetworkServer.Hash.SET_PED_CONFIG_FLAG, player.handle, 223, true);
             List<NetHandle> vehs = new List<NetHandle>();
             vehs = API.getAllVehicles();
             for (int i = 0; i < vehs.Count; i++)

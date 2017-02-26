@@ -23,14 +23,14 @@
 			<img class="iconTest2" src="smsicon.png" onclick="App2();">
 			<img class="iconTest3" src="bankicon.png" onclick="App3();">
 			<img class="iconTest4" src="timeicon.png" onclick="App4();">
-			<img class="iconTest5" src="weathericon.png" onclick="PhoneEventCall('App5');">
-			<img class="iconTest6" src="noteicon.png" onclick="PhoneEventCall('App6');">
-			<img class="iconTest7" src="cameraicon.png" onclick="PhoneEventCall('App7');">
-			<img class="iconTest8" src="settingsicon.png" onclick="PhoneEventCall('App8');">
-			<img class="iconTest9" src="temp50x50.png" onclick="PhoneEventCall('App9');">
-			<img class="iconTest10" src="temp50x50.png" onclick="PhoneEventCall('App10');">
-			<img class="iconTest11" src="temp50x50.png" onclick="PhoneEventCall('App11');">
-			<img class="iconTest12" src="temp50x50.png" onclick="PhoneEventCall('App12');">
+			<img class="iconTest5" src="weathericon.png" onclick="App5();">
+			<img class="iconTest6" src="noteicon.png" onclick="App6();">
+			<img class="iconTest7" src="cameraicon.png" onclick="App7();">
+			<img class="iconTest8" src="settingsicon.png" onclick="App8();">
+			<img class="iconTest9" src="temp50x50.png" onclick="App9();">
+			<img class="iconTest10" src="temp50x50.png" onclick="App10();">
+			<img class="iconTest11" src="temp50x50.png" onclick="App11();">
+			<img class="iconTest12" src="temp50x50.png" onclick="App12();">
 		</div>
 		
 		<div id="appcontainer">
@@ -51,16 +51,49 @@
 			</div>
 			
 			<div id="appload2" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
-				<img class="appload2test" src="phonewall2.png">
+				<img class="appload2test" src="phonewallblank.png">
 			</div>
 			
 			<div id="appload3" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
-				<img class="appload3test" src="phonewall2.png">
+				<img class="appload3test" src="phonewallblank.png">
 			</div>
 			
 			<div id="appload4" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
-				<img class="appload4test" src="phonewall2.png">
+				<img class="appload4test" src="phonewallblank.png">
 			</div>
+			
+			<div id="appload5" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload5test" src="phonewallblank.png">
+			</div>
+			
+			<div id="appload6" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload6test" src="phonewallblank.png">
+			</div>
+			
+			<div id="appload7" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload7test" src="phonewallblank.png">
+			</div>
+			
+			<div id="appload8" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload8test" src="phonewallblank.png">
+			</div>
+			
+			<div id="appload9" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload9test" src="phonewallblank.png">
+			</div>
+			
+			<div id="appload10" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload10test" src="phonewallblank.png">
+			</div>
+			
+			<div id="appload11" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload11test" src="phonewallblank.png">
+			</div>
+			
+			<div id="appload12" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
+				<img class="appload12test" src="phonewallblank.png">
+			</div>
+			
 		</div>
 		
 		<script type="text/javascript">
@@ -157,6 +190,70 @@
 					void element.offsetWidth;
 					element.classList.add("movedownanim");
 				}
+				
+				element = document.getElementById("appload5");
+				if($("#appload5").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
+				
+				element = document.getElementById("appload6");
+				if($("#appload6").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
+				
+				element = document.getElementById("appload7");
+				if($("#appload7").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
+				
+				element = document.getElementById("appload8");
+				if($("#appload8").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
+				
+				element = document.getElementById("appload9");
+				if($("#appload9").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
+				
+				element = document.getElementById("appload10");
+				if($("#appload10").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
+				
+				element = document.getElementById("appload11");
+				if($("#appload11").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
+				
+				element = document.getElementById("appload12");
+				if($("#appload12").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("movedownanim");
+				}
 			}
         </script>
 		
@@ -206,6 +303,94 @@
 		</script>
 		
 		<script type="text/javascript">
+			function App5()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload5");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App6()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload6");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App7()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload7");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App8()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload8");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App9()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload9");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App10()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload10");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App11()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload11");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function App12()
+			{
+				$("#phone").css("pointer-events", "none");
+				var element = document.getElementById("appload12");
+				element.classList.remove("moveoutanim");
+				void element.offsetWidth;
+				element.classList.add("moveinanim");
+			}
+		</script>
+		
+		<script type="text/javascript">
 			function HomeButton()
 			{
 				$("#phone").css("pointer-events", "auto");
@@ -235,6 +420,71 @@
 				
 				element = document.getElementById("appload4");
 				if($("#appload4").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload5");
+				if($("#appload5").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload6");
+				if($("#appload6").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload7");
+				if($("#appload7").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				
+				element = document.getElementById("appload8");
+				if($("#appload8").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload9");
+				if($("#appload9").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload10");
+				if($("#appload10").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload11");
+				if($("#appload11").hasClass("moveinanim"))
+				{
+					element.classList.remove("moveinanim");
+					void element.offsetWidth;
+					element.classList.add("moveoutanim");
+				}
+				
+				element = document.getElementById("appload12");
+				if($("#appload12").hasClass("moveinanim"))
 				{
 					element.classList.remove("moveinanim");
 					void element.offsetWidth;
