@@ -27,6 +27,25 @@
   <file src="noteicon.png" />
   <file src="settingsicon.png"/>
   <file src="contacticon.png"/>
+  <file src="tetrisicon.png"/>
+  <file src="phonetetris.js"/>
+  <file src="phonewallweather.png"/>
+  
+  <file src="weatherclearmoon.png"/>
+  <file src="weathercloudy.png"/>
+  <file src="weathercloudymoon.png"/>
+  <file src="weatherdarkcloudy.png"/>
+  <file src="weatherfoggy.png"/>
+  <file src="weatherfreezingrain.png"/>
+  <file src="weatherrain.png"/>
+  <file src="weathersnow.png"/>
+  <file src="weathersuncloudy.png"/>
+  <file src="weathersunny.png"/>
+  <file src="weathersunrise.png"/>
+  <file src="weathersunset.png"/>
+  <file src="weatherthunder.png"/>
+  <file src="weatherwindchill.png"/>
+  <file src="weatherwindy.png"/>
   <assembly ref="System.XML.dll"/>
   <assembly ref="MongoDB.Bson.dll"/>
   <assembly ref="MongoDB.Driver.dll"/>

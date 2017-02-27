@@ -18,6 +18,127 @@ body {
   left: 8px;
 }
 
+.beforeweather{
+	position: absolute;
+	box-shadow: 0px 0px 5px 2px #000000;
+	top: 20px;
+	left: 7px;
+	z-index: 2;
+}
+#beforeweathertext{
+	position: absolute;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
+	top: 60px;
+	left: 15px;
+	text-align: center;
+	pointer-events: none;
+	text-shadow:
+	 -1px -1px 3px #000,  
+	  1px -1px 3px #000,
+	  -1px 1px 3px #000,
+	   1px 1px 3px #000;
+}
+.afterweather{
+	position: absolute;
+	box-shadow: 0px 0px 5px 2px #000000;
+	top: 20px;
+	left: 67px;
+	z-index: 2;
+}
+#afterweathertext{
+	position: absolute;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
+	top: 60px;
+	left: 65px;
+	text-align: center;
+	pointer-events: none;
+	text-shadow:
+	 -1px -1px 3px #000,  
+	  1px -1px 3px #000,
+	  -1px 1px 3px #000,
+	   1px 1px 3px #000;
+}
+.timeicon{
+	position: absolute;
+	box-shadow: 0px 0px 5px 2px #000000;
+	top: 20px;
+	left: 127px;
+	z-index: 2;
+	transform: scale(0.75, 0.75);
+}
+.forecast1{
+	position: absolute;
+	box-shadow: 0px 0px 5px 2px #000000;
+	top: 100px;
+	left: 7px;
+	z-index: 2;
+	transform: scale(0.75, 0.75);
+}
+#forecast1text{
+	position: absolute;
+	color: white;
+	font-size: 16px;
+	font-weight: bold;
+	top: 100px;
+	left: 60px;
+	text-align: center;
+	pointer-events: none;
+	text-shadow:
+	 -1px -1px 3px #000,  
+	  1px -1px 3px #000,
+	  -1px 1px 3px #000,
+	   1px 1px 3px #000;
+}
+.forecast2{
+	position: absolute;
+	box-shadow: 0px 0px 5px 2px #000000;
+	top: 160px;
+	left: 7px;
+	z-index: 2;
+	transform: scale(0.75, 0.75);
+}
+#forecast2text{
+	position: absolute;
+	color: white;
+	font-size: 16px;
+	font-weight: bold;
+	top: 160px;
+	left: 60px;
+	text-align: center;
+	pointer-events: none;
+	text-shadow:
+	 -1px -1px 3px #000,  
+	  1px -1px 3px #000,
+	  -1px 1px 3px #000,
+	   1px 1px 3px #000;
+}
+.forecast3{
+	position: absolute;
+	box-shadow: 0px 0px 5px 2px #000000;
+	top: 220px;
+	left: 7px;
+	z-index: 2;
+	transform: scale(0.75, 0.75);
+}
+#forecast3text{
+	position: absolute;
+	color: white;
+	font-size: 16px;
+	font-weight: bold;
+	top: 220px;
+	left: 60px;
+	text-align: center;
+	pointer-events: none;
+	text-shadow:
+	 -1px -1px 3px #000,  
+	  1px -1px 3px #000,
+	  -1px 1px 3px #000,
+	   1px 1px 3px #000;
+}
 .contact1{
 	position: absolute;
 	box-shadow: 0px 0px 5px 2px #000000;
