@@ -46,6 +46,8 @@
   <file src="weatherthunder.png"/>
   <file src="weatherwindchill.png"/>
   <file src="weatherwindy.png"/>
+  <file src="fleecalogo.png"/>
+  <file src="temp125x150.png"/>
   <assembly ref="System.XML.dll"/>
   <assembly ref="MongoDB.Bson.dll"/>
   <assembly ref="MongoDB.Driver.dll"/>

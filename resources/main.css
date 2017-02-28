@@ -5,6 +5,10 @@ body {
     padding: 0;
 }
 
+img{
+	user-select: none;
+}
+
 .phone {
   position: absolute;
   top: 0%;
@@ -18,6 +22,12 @@ body {
   left: 8px;
 }
 
+.fleecalogo{
+	position: absolute;
+	top: 10px;
+	left: 0px;
+	z-index: 2;
+}
 .beforeweather{
 	position: absolute;
 	box-shadow: 0px 0px 5px 2px #000000;
@@ -164,6 +174,20 @@ body {
 	  1px -1px 3px #000,
 	  -1px 1px 3px #000,
 	   1px 1px 3px #000;
+}
+.contact1info{
+	position: absolute;
+	top: 0%;
+	left: 0%;
+}
+.contact1backdrop{
+	position: absolute;
+	box-shadow: 0px 0px 5px 2px #000000;
+	top: 50%;
+	left: 50%;
+	margin-left: -62.5px;
+	margin-top: -75px;
+	z-index: 4;
 }
 .iconTest1 {
   position: absolute;
@@ -621,6 +645,8 @@ position: absolute;
 	position: absolute;
 	top: 0px;
 	left: 0px;
+	text-align: center;
+	min-width: 182px;
 }
 
 .phonebody{

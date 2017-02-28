@@ -37,8 +37,13 @@
 		<div id="appcontainer">
 			<div id="appload1" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
 				<img class="appload1test" src="phonewallblank.png">
-				<img class="contact1" src="contacticon.png" onclick="PhoneEventCall('Contact1');">
+				<img class="contact1" src="contacticon.png" onclick="editContact('contact1');">
 				<p id="contact1name">Test<br>McButt</p>
+				<div id="contact1info" style="visibility: hidden;">
+					<p id="contact1firstname">Test<br>McButt</p>
+					<p id="contact1lastname">Test<br>McButt</p>
+					<img class="contact1backdrop" src="temp125x150.png">
+				</div>
 				<img class="contact2" src="contacticon.png" onclick="PhoneEventCall('Contact2');">
 				<p id="contact2name">Test<br>McButt</p>
 				<img class="contact3" src="contacticon.png" onclick="PhoneEventCall('Contact3');">
@@ -69,6 +74,7 @@
 			
 			<div id="appload3" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
 				<img class="appload3test" src="phonewallblank.png">
+				<img class="fleecalogo" src="fleecalogo.png">
 			</div>
 			
 			<div id="appload4" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
@@ -182,6 +188,16 @@
 			{
 				var element = document.getElementById("timetxt");
 				element.innerHTML = strn;
+			}
+		</script>
+		
+		<script type="text/javascript">
+			function editContact(strn)
+			{
+				if(strn === "contact1")
+				{
+					document.getElementById("contact1info").style.visibility = "visible";
+				}
 			}
 		</script>
 		
