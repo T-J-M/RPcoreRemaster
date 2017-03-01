@@ -40,9 +40,10 @@
 				<img class="contact1" src="contacticon.png" onclick="editContact('contact1');">
 				<p id="contact1name">Test<br>McButt</p>
 				<div id="contact1info" style="visibility: hidden;">
-					<p id="contact1firstname">Test<br>McButt</p>
-					<p id="contact1lastname">Test<br>McButt</p>
 					<img class="contact1backdrop" src="temp125x150.png">
+					<input id="contact1firstname" type="text" name="firstname" value="Test"><br>
+					<input id="contact1lastname" type="text" name="lastname" value="McButt">
+					<input id="contact1number" type="tel" name="phonenumber" value="2164591">
 				</div>
 				<img class="contact2" src="contacticon.png" onclick="PhoneEventCall('Contact2');">
 				<p id="contact2name">Test<br>McButt</p>
@@ -109,7 +110,7 @@
 			</div>
 			
 			<div id="appload9" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
-				<img class="appload9test" src="phonewallblank.png">
+				<canvas id="game1" width="183" height="324"></canvas>
 			</div>
 			
 			<div id="appload10" style="z-index:2; transform:scale(0.0,0.0); animation-fill-mode:forwards;">
@@ -418,6 +419,7 @@
 				element.classList.remove("moveoutanim");
 				void element.offsetWidth;
 				element.classList.add("moveinanim");
+				game1Reset = true;
 			}
 		</script>
 		
@@ -529,6 +531,7 @@
 					element.classList.remove("moveinanim");
 					void element.offsetWidth;
 					element.classList.add("moveoutanim");
+					game1Reset = true;
 				}
 				
 				element = document.getElementById("appload10");
@@ -555,6 +558,192 @@
 					element.classList.add("moveoutanim");
 				}
 			}
+		</script>	
+		
+		<script type="text/javascript">
+			var canvas = document.getElementById("game1");
+			var ctx = canvas.getContext("2d");
+			var ballRadius = 5;
+			var x = canvas.width/2;
+			var y = canvas.height-110;
+			var dx = 2;
+			var dy = -2;
+			var paddleHeight = 5;
+			var paddleWidth = 40;
+			var paddleX = (canvas.width-paddleWidth)/2;
+			var rightPressed = false;
+			var leftPressed = false;
+			var brickRowCount = 7;
+			var brickColumnCount = 3;
+			var brickWidth = 15;
+			var brickHeight = 10;
+			var brickPadding = 8;
+			var brickOffsetTop = 30;
+			var brickOffsetLeft = 15;
+			var score = 0;
+			var lives = 3;
+			var game1Reset = false;
+
+			var bricks = [];
+			for(c=0; c<brickColumnCount; c++) {
+				bricks[c] = [];
+				for(r=0; r<brickRowCount; r++) {
+					bricks[c][r] = { x: 0, y: 0, status: 1 };
+				}
+			}
+
+			document.addEventListener("keydown", keyDownHandler, false);
+			document.addEventListener("keyup", keyUpHandler, false);
+			document.addEventListener("mousemove", mouseMoveHandler, false);
+
+			function keyDownHandler(e) {
+				if(e.keyCode == 39) {
+					rightPressed = true;
+				}
+				else if(e.keyCode == 37) {
+					leftPressed = true;
+				}
+			}
+			function keyUpHandler(e) {
+				if(e.keyCode == 39) {
+					rightPressed = false;
+				}
+				else if(e.keyCode == 37) {
+					leftPressed = false;
+				}
+			}
+			function mouseMoveHandler(e) {
+				var relativeX = e.clientX - canvas.offsetLeft;
+				if(relativeX > 0 && relativeX < canvas.width) {
+					paddleX = relativeX - paddleWidth/2;
+				}
+			}
+			function collisionDetection() {
+				for(c=0; c<brickColumnCount; c++) {
+					for(r=0; r<brickRowCount; r++) {
+						var b = bricks[c][r];
+						if(b.status == 1) {
+							if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+								dy = -dy;
+								b.status = 0;
+								score++;
+								if(score == brickRowCount*brickColumnCount) {
+									game1Reset = true;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			function drawBall() {
+				ctx.beginPath();
+				ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+				ctx.fillStyle = "#000000";
+				ctx.fill();
+				ctx.closePath();
+			}
+			function drawPaddle() {
+				ctx.beginPath();
+				ctx.rect(paddleX, canvas.height-paddleHeight-100, paddleWidth, paddleHeight);
+				ctx.fillStyle = "#000000";
+				ctx.fill();
+				ctx.closePath();
+			}
+			function drawBricks() {
+				for(c=0; c<brickColumnCount; c++) {
+					for(r=0; r<brickRowCount; r++) {
+						if(bricks[c][r].status == 1) {
+							var brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
+							var brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
+							bricks[c][r].x = brickX;
+							bricks[c][r].y = brickY;
+							ctx.beginPath();
+							ctx.rect(brickX, brickY, brickWidth, brickHeight);
+							ctx.fillStyle = "#000000";
+							ctx.fill();
+							ctx.closePath();
+						}
+					}
+				}
+			}
+			function drawScore() {
+				ctx.font = "16px Arial";
+				ctx.fillStyle = "#000000";
+				ctx.fillText("Score: "+score, 8, 20);
+			}
+			function drawLives() {
+				ctx.font = "16px Arial";
+				ctx.fillStyle = "#000000";
+				ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+			}
+
+			function draw() {
+				if(game1Reset === true)
+				{
+					game1Reset = false;
+					x = canvas.width/2;
+					y = canvas.height-110;
+					dx = 2;
+					dy = -2;
+					lives = 3;
+					score = 0;
+					paddleX = (canvas.width-paddleWidth)/2;
+					
+					bricks = [];
+					for(c=0; c<brickColumnCount; c++) {
+						bricks[c] = [];
+						for(r=0; r<brickRowCount; r++) {
+							bricks[c][r] = { x: 0, y: 0, status: 1 };
+						}
+					}
+				}
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				drawBricks();
+				drawBall();
+				drawPaddle();
+				drawScore();
+				drawLives();
+				collisionDetection();
+				
+				if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+					dx = -dx;
+				}
+				if(y + dy < ballRadius) {
+					dy = -dy;
+				}
+				else if(y + dy > canvas.height-100-ballRadius) {
+					if(x > paddleX && x < paddleX + paddleWidth) {
+						dy = -dy;
+					}
+					else {
+						lives--;
+						if(!lives) {
+							game1Reset = true;
+						}
+						else {
+							x = canvas.width/2;
+							y = canvas.height-110;
+							dx = 3;
+							dy = -3;
+							paddleX = (canvas.width-paddleWidth)/2;
+						}
+					}
+				}
+				
+				if(rightPressed && paddleX < canvas.width-paddleWidth) {
+					paddleX += 7;
+				}
+				else if(leftPressed && paddleX > 0) {
+					paddleX -= 7;
+				}
+				
+				x += dx;
+				y += dy;
+				requestAnimationFrame(draw);
+			}
+
+			draw();
 		</script>
     </body>
 </html>
